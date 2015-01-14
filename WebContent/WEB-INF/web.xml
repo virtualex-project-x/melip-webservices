@@ -4,7 +4,7 @@
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
-      classpath:com/melip/config/applicationContext.xml
+      classpath:com/melip/webservices/config/applicationContext.xml
     </param-value>
   </context-param>
   <listener>
@@ -23,7 +23,7 @@
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>com.melip.resource</param-value>
+      <param-value>com.melip.webservices.resource</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
