@@ -33,9 +33,9 @@ public class BeanCreator {
   /**
    * Beanオブジェクトを生成します。
    * 
-   * @param beanId 生成するBeanのID。
-   * @param clazz 生成するBeanのクラス。
-   * @return Beanオブジェクト。
+   * @param beanId 生成するBeanのID
+   * @param clazz 生成するBeanのクラス
+   * @return Beanオブジェクト
    */
   public static <T> T getBean(String beanId, Class<T> clazz) {
 

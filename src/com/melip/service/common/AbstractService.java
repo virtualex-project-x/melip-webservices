@@ -14,7 +14,7 @@ public abstract class AbstractService implements IService {
   /**
    * DAOを取得します。
    * 
-   * @return DAO。
+   * @return DAO
    */
   public IDao getDao() {
     return dao;
@@ -23,7 +23,7 @@ public abstract class AbstractService implements IService {
   /**
    * DAOを設定します。
    * 
-   * @param DAO。
+   * @param DAO
    */
   public void setDao(IDao dao) {
     this.dao = dao;

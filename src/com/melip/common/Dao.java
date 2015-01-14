@@ -44,7 +44,7 @@ public class Dao implements IDao {
   /**
    * MyBatis設定ファイル名を取得します。
    * 
-   * @return MyBatis設定ファイルのパス。
+   * @return MyBatis設定ファイルのパス
    */
   public String getResourceFileName() {
     return resourceFileName;
@@ -53,7 +53,7 @@ public class Dao implements IDao {
   /**
    * MyBatis設定ファイル名を設定します。
    * 
-   * @param resourceFileName MyBatis設定ファイルのパス。
+   * @param resourceFileName MyBatis設定ファイルのパス
    */
   public void setResourceFileName(String resourceFileName) {
     this.resourceFileName = resourceFileName;

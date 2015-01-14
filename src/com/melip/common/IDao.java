@@ -10,7 +10,7 @@ public interface IDao {
   /**
    * SQL実行用のSQLSessionFactoryを取得します。
    * 
-   * @return SQL実行用のSQLSessionFactory。
+   * @return SQL実行用のSQLSessionFactory
    */
   public SqlSessionFactory getSqlSessionFactory();
 }
