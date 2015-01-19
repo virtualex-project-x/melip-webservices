@@ -8,8 +8,8 @@
     <plugin type="com.melip.webservices.mybatis.generator.EntityClassNameChange"></plugin>
     <jdbcConnection driverClass="${db.driver.class}" connectionURL="${db.url}"
       userId="${db.username}" password="${db.password}" />
-    <javaModelGenerator targetPackage="com.melip.webservices.entity" targetProject="melip" />
-    <table schema="melip" tableName="%">
+    <javaModelGenerator targetPackage="com.melip.webservices.entity" targetProject="melip-webservices" />
+    <table schema="melip" tableName="M_%">
     </table>
   </context>
 
