@@ -9,7 +9,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class BeanCreator {
 
   /** アプリケーションコンテキスト */
-  private static ApplicationContext _applicationContext = null;
+  private static ApplicationContext _applicationContext;
   /** コンテキストパス */
   private static final String CONTEXT_PATH = "com/melip/webservices/config/applicationContext.xml";
 

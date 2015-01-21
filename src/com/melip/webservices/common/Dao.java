@@ -17,9 +17,9 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 public class Dao implements IDao {
 
   /** SQL実行用のSQLSession */
-  private SqlSessionFactory _sessionFactory = null;
+  private SqlSessionFactory _sessionFactory;
   /** MyBatis設定ファイル名 */
-  private String resourceFileName = null;
+  private String resourceFileName;
 
   /**
    * 初期化処理を実施します。<br>
