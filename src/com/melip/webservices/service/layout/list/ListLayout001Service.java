@@ -1,6 +1,6 @@
 package com.melip.webservices.service.layout.list;
 
-import com.melip.webservices.dto.screen.ScreenDto;
+import com.melip.common.dto.screen.ScreenDto;
 import com.melip.webservices.service.common.AbstractService;
 
 /**
