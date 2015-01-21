@@ -6,4 +6,6 @@ package com.melip.webservices.resource.common;
  */
 public class AbstractResource implements IResource {
 
+  /** JSONのメディアタイプ（UTF-8） */
+  protected static final String MEDIA_TYPE_JSON = "application/json;charset=UTF-8";
 }
