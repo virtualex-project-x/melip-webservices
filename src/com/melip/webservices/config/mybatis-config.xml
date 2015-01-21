@@ -4,6 +4,11 @@
 
   <properties resource="com/melip/webservices/config/config.properties" />
 
+  <settings>
+    <!-- log4jを利用する -->
+    <setting name="logImpl" value="LOG4J" />
+  </settings>
+
   <environments default="dbConnect">
     <environment id="dbConnect">
       <transactionManager type="JDBC" />
@@ -17,7 +22,9 @@
   </environments>
 
   <mappers>
+    <!-- TODO:ワイルドカードで指定できないか？ -->
     <mapper resource="com/melip/webservices/mapper/test-dao-mapper.xml" />
+    <mapper resource="com/melip/webservices/mapper/facility-dao-mapper.xml" />
   </mappers>
 
 </configuration>
