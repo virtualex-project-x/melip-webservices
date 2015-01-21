@@ -1,5 +1,7 @@
 package com.melip.webservices.service.common;
 
+import org.apache.ibatis.session.SqlSession;
+
 import com.melip.webservices.common.IDao;
 
 /**
@@ -9,7 +11,7 @@ import com.melip.webservices.common.IDao;
 public abstract class AbstractService implements IService {
 
   /** DAO */
-  private IDao dao = null;
+  private IDao dao;
 
   /**
    * DAOを取得します。
@@ -27,6 +29,15 @@ public abstract class AbstractService implements IService {
    */
   public void setDao(IDao dao) {
     this.dao = dao;
+  }
+
+  /**
+   * SQLセッションを取得します。
+   * 
+   * @return SQLセッション
+   */
+  protected SqlSession getSession() {
+    return getDao().getSqlSessionFactory().openSession();
   }
 
 }
