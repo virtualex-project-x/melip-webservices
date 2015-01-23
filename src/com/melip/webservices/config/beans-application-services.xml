@@ -8,9 +8,37 @@
     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
-  <!-- テストサービス -->
-  <bean id="testService" class="com.melip.webservices.service.TestService" scope="prototype" lazy-init="true">
+  <!-- 基底サービス -->
+  <bean id="abstractService" class="com.melip.webservices.service.AbstractService" scope="prototype"
+    lazy-init="true">
     <property name="dao" ref="dao" />
+  </bean>
+
+  <!-- #################### 通常サービス #################### -->
+
+  <!-- テストサービス -->
+  <bean id="testService" class="com.melip.webservices.service.TestService" scope="prototype"
+    lazy-init="true" parent="abstractService">
+  </bean>
+
+  <!-- 地域サービス -->
+  <bean id="regionService" class="com.melip.webservices.service.RegionService" scope="prototype"
+    lazy-init="true" parent="abstractService">
+    <property name="selectRegionSqlId" value="com.melip.webservices.mapper.Region.selectRegion" />
+  </bean>
+
+  <!-- 施設サービス -->
+  <bean id="facilityService" class="com.melip.webservices.service.FacilityService" scope="prototype"
+    lazy-init="true" parent="abstractService">
+    <property name="selectFacilitySqlId" value="com.melip.webservices.mapper.Facility.selectFacility" />
+  </bean>
+
+  <!-- #################### レイアウトサービス #################### -->
+
+  <!-- レイアウトサービス -->
+  <bean id="layoutService" class="com.melip.webservices.service.layout.LayoutService" scope="prototype"
+    lazy-init="true" parent="abstractService">
+    <property name="selectLayoutScreenSqlId" value="com.melip.webservices.mapper.Layout.selectLayoutScreen" />
   </bean>
 
 </beans>

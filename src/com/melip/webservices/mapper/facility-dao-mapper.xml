@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 施設サービス用 -->
+<mapper namespace="com.melip.webservices.mapper.Facility">
+
+  <!-- 施設DTO用resultMap -->
+  <resultMap id="facilityDtoResultMap" type="com.melip.webservices.dto.FacilityDto">
+    <id property="facilityId" column="facilityId" />
+    <collection property="attrDtoList" ofType="com.melip.common.dto.common.AttrDto">
+      <id property="attrGrpId" column="attrGrpId" />
+      <result property="attrGrpType" column="attrGrpType" />
+      <result property="attrGrpNm" column="attrGrpNm" />
+      <result property="attrVal" column="attrVal" />
+      <result property="attrCdVal" column="attrCdVal" />
+    </collection>
+  </resultMap>
+
+  <!-- 施設情報取得 -->
+  <select id="selectFacility" resultMap="facilityDtoResultMap" parameterType="int" useCache="false">
+
+  <!-- TODO:
+    ・パラメータのオブジェクト化
+      ・ステータス
+      ・言語区分
+      ・地域ID
+      ・施設ID
+    ・属性グループ種別のコードグループIDの検討
+      パラメータで渡すか？ベタ書きで良いか？
+  -->
+
+    select
+        a.FACILITY_ID          as facilityId
+      , a.FACILITY_ATTR_GRP_ID as attrGrpId
+      , b.CD_NM                as attrGrpType
+      , a.NM                   as attrGrpNm
+      , case 
+        when c.CD_NM is null 
+        then a.val 
+        else c.CD_NM 
+        end                    as attrVal
+      , case 
+        when c.cd_nm is null 
+        then null 
+        else a.VAL 
+        end                    as attrCdVal 
+    from
+      ( 
+        select
+            a.FACILITY_ID
+          , d.FACILITY_ATTR_GRP_ID
+          , e.NM
+          , c.VAL
+          , d.TYPE
+          , d.CD_GRP_ID 
+        from
+          m_facility a 
+          inner join m_facility_attr_val b 
+            on a.FACILITY_ID = b.FACILITY_ID 
+            and b.STS = 'val' 
+          inner join m_facility_attr_val_lang c 
+            on b.FACILITY_ATTR_VAL_ID = c.FACILITY_ATTR_VAL_ID 
+            and c.LANG_DIV in ('ja', 'common') 
+            and c.STS = 'val' 
+          inner join m_facility_attr_grp d 
+            on b.FACILITY_ATTR_GRP_ID = d.FACILITY_ATTR_GRP_ID 
+            and d.STS = 'val' 
+          inner join m_facility_attr_grp_lang e 
+            on d.FACILITY_ATTR_GRP_ID = e.FACILITY_ATTR_GRP_ID 
+            and e.LANG_DIV in ('ja', 'common') 
+            and e.STS = 'val' 
+        where
+          a.STS = 'val' 
+          <if test = "_parameter != null">
+            and a.FACILITY_ID = #{id}
+          </if>
+      ) a 
+      left outer join v_cd b 
+        on b.CD_GRP_ID = '4' 
+        and a.TYPE = b.CD 
+        and b.LANG_DIV in ('ja', 'common') 
+      left outer join v_cd c 
+        on a.CD_GRP_ID = c.CD_GRP_ID 
+        and a.VAL = c.CD 
+        and c.LANG_DIV in ('ja', 'common') 
+    order by
+      a.FACILITY_ID
+      , a.FACILITY_ATTR_GRP_ID
+
+  </select>
+
+</mapper>
