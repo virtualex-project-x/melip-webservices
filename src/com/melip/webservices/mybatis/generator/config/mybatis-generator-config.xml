@@ -9,6 +9,7 @@
     <jdbcConnection driverClass="${db.driver.class}" connectionURL="${db.url}"
       userId="${db.username}" password="${db.password}" />
     <javaModelGenerator targetPackage="com.melip.webservices.entity" targetProject="melip-webservices" />
+    <!-- TODO:ビューを含めないために「M_%」としているが「T_～」ができた場合に対応できないため要検討 -->
     <table schema="melip" tableName="M_%">
     </table>
   </context>
