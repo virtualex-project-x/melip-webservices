@@ -22,14 +22,14 @@
   </bean>
 
   <!-- 地域サービス -->
-  <bean id="regionService" class="com.melip.webservices.service.RegionService" scope="prototype"
+  <bean id="regionService" class="com.melip.webservices.service.region.RegionService" scope="prototype"
     lazy-init="true" parent="abstractService">
     <property name="selectRegionSqlId" value="com.melip.webservices.mapper.Region.selectRegion" />
   </bean>
 
   <!-- 施設サービス -->
-  <bean id="facilityService" class="com.melip.webservices.service.FacilityService" scope="prototype"
-    lazy-init="true" parent="abstractService">
+  <bean id="facilityService" class="com.melip.webservices.service.facility.FacilityService"
+    scope="prototype" lazy-init="true" parent="abstractService">
     <property name="selectFacilitySqlId" value="com.melip.webservices.mapper.Facility.selectFacility" />
   </bean>
 
