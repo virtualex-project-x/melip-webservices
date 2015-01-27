@@ -21,35 +21,34 @@ public interface IFacilityService {
   public List<FacilityDto> getFacilityList(String langDiv);
 
   /**
-   * 受け取った地域に所属する施設情報を取得します。<br>
-   * 属性情報は受け取った施設属性グループの情報のみです。
-   * 
-   * @param langDiv 言語区分
-   * @param regionId 地域ID
-   * @param facilityAttrGrpId 施設属性グループID
-   * @return 施設DTOリスト
-   */
-  public List<FacilityDto> getFacilityList(String langDiv, Integer regionId,
-      Integer facilityAttrGrpId);
-
-  /**
-   * 受け取った地域に所属する施設情報を取得します。<br>
-   * 
-   * @param langDiv 言語区分
-   * @param regionId 地域ID
-   * @return 施設DTOリスト
-   */
-  public List<FacilityDto> getFacilityListByRegionId(String langDiv, Integer regionId);
-
-  /**
    * 全施設情報を取得します。<br>
    * 属性情報は受け取った施設属性グループの情報のみです。
    * 
    * @param langDiv 言語区分
    * @param facilityAttrGrpId 施設属性グループID
+   * @return
+   */
+  public List<FacilityDto> getFacilityList(String langDiv, Integer facilityAttrGrpId);
+
+  /**
+   * 受け取った地域に所属する施設情報を取得します。<br>
+   * 
+   * @param langDiv 言語区分
+   * @param regionId 地域ID
    * @return 施設DTOリスト
    */
-  public List<FacilityDto> getFacilityListByFacilityAttrGrpId(String langDiv,
+  public List<FacilityDto> getFacilityListByRegion(String langDiv, Integer regionId);
+
+  /**
+   * 受け取った地域に所属する施設情報を取得します。<br>
+   * 属性情報は受け取った施設属性グループの情報のみです。
+   * 
+   * @param langDiv 言語区分
+   * @param regionId 地域ID
+   * @param facilityAttrGrpId 施設属性グループID
+   * @return 施設DTOリスト
+   */
+  public List<FacilityDto> getFacilityListByRegion(String langDiv, Integer regionId,
       Integer facilityAttrGrpId);
 
   /**
