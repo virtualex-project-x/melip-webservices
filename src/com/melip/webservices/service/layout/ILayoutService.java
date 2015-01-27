@@ -13,13 +13,13 @@ public interface ILayoutService {
   /**
    * 受け取ったスクリーンオブジェクトの遷移先画面のスクリーンDTOを取得します。
    * 
-   * @param langdiv 言語区分
+   * @param langDiv 言語区分
    * @param screenObjId スクリーンオブジェクトID
    * @param regionId 地域ID
    * @param facilityId 施設ID
    * @param facilityGrpId 施設グループID
    * @return スクリーンDTO
    */
-  public ScreenDto getScreenDto(String langdiv, Integer screenObjId, Integer regionId,
+  public ScreenDto getScreenDto(String langDiv, Integer screenObjId, Integer regionId,
       Integer facilityId, Integer facilityGrpId);
 }
