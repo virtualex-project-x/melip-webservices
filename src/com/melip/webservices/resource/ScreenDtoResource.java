@@ -5,6 +5,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.melip.common.dto.screen.ScreenDto;
 import com.melip.webservices.common.BeanCreator;
 import com.melip.webservices.resource.common.AbstractResource;
@@ -29,12 +31,12 @@ public class ScreenDtoResource extends AbstractResource {
 
   @GET
   @Produces(MEDIA_TYPE_JSON)
-  public ScreenDto getScreenDto(@QueryParam("langDiv") String langdiv,
+  public ScreenDto getScreenDto(@QueryParam("langDiv") String langDiv,
       @QueryParam("screenObjId") String screenObjId, @QueryParam("regionId") String regionId,
       @QueryParam("facilityId") String facilityId, @QueryParam("facilityGrpId") String facilityGrpId) {
 
     // パラメータ設定
-    setParameters(langdiv, screenObjId, regionId, facilityId, facilityGrpId);
+    setParameters(langDiv, screenObjId, regionId, facilityId, facilityGrpId);
 
     ILayoutService service = BeanCreator.getBean(ILayoutService.SERVICE_NAME, ILayoutService.class);
     ScreenDto screenDto =
@@ -47,25 +49,29 @@ public class ScreenDtoResource extends AbstractResource {
   /**
    * パラメータを設定します。
    * 
-   * @param langdiv 言語区分
+   * @param langDiv 言語区分
    * @param screenObjId スクリーンオブジェクトID
    * @param regionId 地域ID
    * @param facilityId 施設ID
    * @param facilityGrpId 施設グループID
    */
-  private void setParameters(String langdiv, String screenObjId, String regionId,
+  private void setParameters(String langDiv, String screenObjId, String regionId,
       String facilityId, String facilityGrpId) {
 
     // 言語区分
-    setLangDiv(langdiv);
+    setLangDiv(langDiv);
     // スクリーンオブジェクトID
     setScreenObjId(Integer.valueOf(screenObjId));
     // 地域ID
     setRegionId(Integer.valueOf(regionId));
     // 施設ID
-    setFacilityId(Integer.valueOf(facilityId));
+    if (StringUtils.isNotEmpty(facilityId)) {
+      setFacilityId(Integer.valueOf(facilityId));
+    }
     // 施設グループID
-    setFacilityGrpId(Integer.valueOf(facilityGrpId));
+    if (StringUtils.isNotEmpty(facilityGrpId)) {
+      setFacilityGrpId(Integer.valueOf(facilityGrpId));
+    }
   }
 
   /**
