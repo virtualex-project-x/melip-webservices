@@ -153,22 +153,23 @@
           #{item}
         </foreach> 
     where
-      s.sts in
+      s.SCREEN_ID = ( 
+        select
+            TARGET_SCREEN_ID 
+        from
+          m_screen_obj 
+        where
+          SCREEN_OBJ_ID = #{screenObjId}
+      ) 
+      and s.sts in
       <foreach collection="stsArray" item="item" open="(" separator="," close=")">
         #{item}
       </foreach> 
-      <if test="screenObjId != null"> 
-        and s.SCREEN_ID = ( 
-          select
-              TARGET_SCREEN_ID 
-          from
-            m_screen_obj 
-          where
-            SCREEN_OBJ_ID = #{screenObjId}
-        ) 
-      </if> 
     order by
-      so.SCREEN_OBJ_ID
+      l.LAYOUT_ID
+      , log.LAYOUT_OBJ_GRP_ID
+      , lo.LAYOUT_OBJ_ID
+      , so.SCREEN_OBJ_ID
 
   </select>
 
