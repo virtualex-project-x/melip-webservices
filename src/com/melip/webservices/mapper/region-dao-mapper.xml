@@ -5,10 +5,11 @@
 <mapper namespace="com.melip.webservices.mapper.Region">
 
   <!-- 地域DTO用resultMap -->
-  <resultMap id="regionDtoResultMap" type="com.melip.webservices.dto.RegionDto">
+  <resultMap id="regionDtoResultMap" type="com.melip.webservices.dto.region.RegionDto">
     <id property="regionId" column="regionId" />
     <collection property="attrDtoList" ofType="com.melip.common.dto.common.AttrDto">
       <id property="attrGrpId" column="attrGrpId" />
+      <result property="regionId" column="regionId" />
       <result property="attrGrpType" column="attrGrpType" />
       <result property="attrGrpNm" column="attrGrpNm" />
       <result property="attrVal" column="attrVal" />
@@ -28,15 +29,15 @@
     select
         a.REGION_ID          as regionId
       , a.REGION_ATTR_GRP_ID as attrGrpId
-      , cd1.CD_NM            as attrGrpType
+      , a.TYPE               as attrGrpType
       , a.NM                 as attrGrpNm
       , case 
-        when cd2.CD_NM is null 
+        when cd1.CD_NM is null 
         then a.val 
-        else cd2.CD_NM 
+        else cd1.CD_NM 
         end                  as attrVal
       , case 
-        when cd2.cd_nm is null 
+        when cd1.cd_nm is null 
         then null 
         else a.VAL 
         end                  as attrCdVal 
@@ -96,16 +97,9 @@
           </if>
       ) a 
       left outer join v_cd cd1 
-        on cd1.CD_GRP_ID = '4' 
-        and a.TYPE = cd1.CD 
+        on a.CD_GRP_ID = cd1.CD_GRP_ID 
+        and a.VAL = cd1.CD 
         and cd1.LANG_DIV in
-        <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
-      left outer join v_cd cd2 
-        on a.CD_GRP_ID = cd2.CD_GRP_ID 
-        and a.VAL = cd2.CD 
-        and cd2.LANG_DIV in
         <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
           #{item}
         </foreach> 
