@@ -2,7 +2,7 @@ package com.melip.webservices.service.facility;
 
 import java.util.List;
 
-import com.melip.webservices.dto.FacilityDto;
+import com.melip.webservices.dto.facility.FacilityDto;
 import com.melip.webservices.service.common.AbstractService;
 
 /**

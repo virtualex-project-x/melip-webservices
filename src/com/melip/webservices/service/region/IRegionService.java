@@ -2,7 +2,7 @@ package com.melip.webservices.service.region;
 
 import java.util.List;
 
-import com.melip.webservices.dto.RegionDto;
+import com.melip.webservices.dto.region.RegionDto;
 
 /**
  * 地域のサービスインタフェースです。
