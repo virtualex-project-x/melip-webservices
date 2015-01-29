@@ -1,4 +1,4 @@
-package com.melip.webservices.dto;
+package com.melip.webservices.dto.region;
 
 import java.util.List;
 
@@ -6,17 +6,17 @@ import com.melip.common.dto.common.AbstractDto;
 import com.melip.common.dto.common.AttrDto;
 
 /**
- * 施設DTO
+ * 地域DTO
  */
-public class FacilityDto extends AbstractDto {
+public class RegionDto extends AbstractDto {
 
-  /** 施設IDのフィールド名 */
-  public static final String FIELD_FACILITY_ID = "facilityId";
+  /** 地域IDのフィールド名 */
+  public static final String FIELD_REGION_ID = "regionId";
   /** 属性DTOリストのフィールド名 */
   public static final String FIELD_ATTR_DTO_LIST = "attrDtoList";
 
-  /** 施設ID */
-  private Integer facilityId;
+  /** 地域ID */
+  private Integer regionId;
   /** 属性DTOリスト */
   private List<AttrDto> attrDtoList;
 
@@ -24,21 +24,21 @@ public class FacilityDto extends AbstractDto {
   private static final long serialVersionUID = 1L;
 
   /**
-   * 施設IDを取得します。
+   * 地域IDを取得します。
    * 
-   * @return 施設ID
+   * @return 地域ID
    */
-  public Integer getFacilityId() {
-    return facilityId;
+  public Integer getRegionId() {
+    return regionId;
   }
 
   /**
-   * 施設IDを設定します。
+   * 地域IDを設定します。
    * 
-   * @param facilityId 施設ID
+   * @param regionId 地域ID
    */
-  public void setFacilityId(Integer facilityId) {
-    this.facilityId = facilityId;
+  public void setRegionId(Integer regionId) {
+    this.regionId = regionId;
   }
 
   /**
