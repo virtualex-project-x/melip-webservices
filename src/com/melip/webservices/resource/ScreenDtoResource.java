@@ -20,8 +20,8 @@ public class ScreenDtoResource extends AbstractResource {
 
   /** 言語区分 */
   private String langDiv;
-  /** スクリーンオブジェクトID */
-  private Integer screenObjId;
+  /** 対象スクリーンID */
+  private Integer targetScreenId;
   /** 地域ID */
   private Integer regionId;
   /** 施設ID */
@@ -29,18 +29,28 @@ public class ScreenDtoResource extends AbstractResource {
   /** 施設グループID */
   private Integer facilityGrpId;
 
+  /**
+   * スクリーンDTOをJSON形式で取得します。
+   * 
+   * @param langDiv 言語区分
+   * @param targetScreenId 対象スクリーンID
+   * @param regionId 地域ID
+   * @param facilityId 施設ID
+   * @param facilityGrpId
+   * @return 施設グループID
+   */
   @GET
   @Produces(MEDIA_TYPE_JSON)
   public ScreenDto getScreenDto(@QueryParam("langDiv") String langDiv,
-      @QueryParam("screenObjId") String screenObjId, @QueryParam("regionId") String regionId,
+      @QueryParam("targetScreenId") String targetScreenId, @QueryParam("regionId") String regionId,
       @QueryParam("facilityId") String facilityId, @QueryParam("facilityGrpId") String facilityGrpId) {
 
     // パラメータ設定
-    setParameters(langDiv, screenObjId, regionId, facilityId, facilityGrpId);
+    setParameters(langDiv, targetScreenId, regionId, facilityId, facilityGrpId);
 
     ILayoutService service = BeanCreator.getBean(ILayoutService.SERVICE_NAME, ILayoutService.class);
     ScreenDto screenDto =
-        service.getScreenDto(getLangDiv(), getScreenObjId(), getRegionId(), getFacilityId(),
+        service.getScreenDto(getLangDiv(), getTargetScreenId(), getRegionId(), getFacilityId(),
             getFacilityGrpId());
 
     return screenDto;
@@ -50,18 +60,18 @@ public class ScreenDtoResource extends AbstractResource {
    * パラメータを設定します。
    * 
    * @param langDiv 言語区分
-   * @param screenObjId スクリーンオブジェクトID
+   * @param targetScreenId 対象スクリーンID
    * @param regionId 地域ID
    * @param facilityId 施設ID
    * @param facilityGrpId 施設グループID
    */
-  private void setParameters(String langDiv, String screenObjId, String regionId,
+  private void setParameters(String langDiv, String targetScreenId, String regionId,
       String facilityId, String facilityGrpId) {
 
     // 言語区分
     setLangDiv(langDiv);
-    // スクリーンオブジェクトID
-    setScreenObjId(Integer.valueOf(screenObjId));
+    // 対象スクリーンID
+    setTargetScreenId(Integer.valueOf(targetScreenId));
     // 地域ID
     setRegionId(Integer.valueOf(regionId));
     // 施設ID
@@ -93,21 +103,21 @@ public class ScreenDtoResource extends AbstractResource {
   }
 
   /**
-   * スクリーンオブジェクトIDを取得します。
+   * 対象スクリーンIDを取得します。
    * 
-   * @return スクリーンオブジェクトID
+   * @return 対象スクリーンID
    */
-  public Integer getScreenObjId() {
-    return screenObjId;
+  public Integer getTargetScreenId() {
+    return targetScreenId;
   }
 
   /**
-   * スクリーンオブジェクトIDを設定します。
+   * 対象スクリーンIDを設定します。
    * 
-   * @param screenObjId スクリーンオブジェクトID
+   * @param targetScreenId 対象スクリーンID
    */
-  public void setScreenObjId(Integer screenObjId) {
-    this.screenObjId = screenObjId;
+  public void setTargetScreenId(Integer targetScreenId) {
+    this.targetScreenId = targetScreenId;
   }
 
   /**

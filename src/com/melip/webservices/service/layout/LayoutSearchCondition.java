@@ -7,26 +7,25 @@ import com.melip.webservices.service.common.SearchCondition;
  */
 public class LayoutSearchCondition extends SearchCondition {
 
-  /** スクリーンオブジェクトID */
-  private Integer screenObjId;
+  /** 対象スクリーンID */
+  private Integer targetScreenId;
 
   /**
-   * スクリーンオブジェクトIDを取得します。
+   * 対象スクリーンIDを取得します。
    * 
-   * @return スクリーンオブジェクトID
+   * @return 対象スクリーンID
    */
-  public Integer getScreenObjId() {
-    return screenObjId;
+  public Integer getTargetScreenId() {
+    return targetScreenId;
   }
 
   /**
-   * スクリーンオブジェクトIDを設定します。
+   * 対象スクリーンIDを設定します。
    * 
-   * @param screenObjId the screenObjId to set
+   * @param targetScreenId 対象スクリーンID
    */
-  public void setScreenObjId(Integer screenObjId) {
-    this.screenObjId = screenObjId;
+  public void setTargetScreenId(Integer targetScreenId) {
+    this.targetScreenId = targetScreenId;
   }
-
 
 }
