@@ -5,68 +5,38 @@
 <mapper namespace="com.melip.webservices.mapper.Layout">
 
   <!-- レイアウト・スクリーンDTO用resultMap -->
-  <resultMap id="layoutScreenDtoResultMap" type="com.melip.webservices.dto.LayoutScreenDto">
-    <id property="layoutScreenId" column="screenObjId"/>
-    <association property="layout" javaType="com.melip.webservices.entity.Layout">
-      <id property="layoutId" column="layoutId" />
-      <result property="createDatetime" column="layoutCreateDatetime" />
-      <result property="createUser" column="layoutCreateUser" />
-      <result property="updateDatetime" column="layoutUpdateDatetime" />
-      <result property="updateUser" column="layoutUpdateUser" />
-      <result property="sts" column="layoutSts" />
-      <result property="alias" column="layoutAlias" />
-      <result property="nm" column="layoutNm" />
-      <result property="type" column="layoutType" />
-    </association>
-    <association property="layoutObjGrp" javaType="com.melip.webservices.entity.LayoutObjGrp">
+  <resultMap id="layoutScreenDtoResultMap" type="com.melip.webservices.dto.layout.LayoutScreenDto">
+    <id property="layoutId" column="layoutId" />
+    <result property="layoutAlias" column="layoutAlias" />
+    <result property="layoutNm" column="layoutNm" />
+    <result property="layoutType" column="layoutType" />
+    <result property="layoutTypeCdAlias" column="layoutTypeCdAlias" />
+    <result property="screenId" column="screenId" />
+    <result property="regionId" column="screenRegionId" />
+    <result property="screenEntity" column="screenEntity" />
+    <result property="screenNm" column="screenNm" />
+    <collection property="layoutScreenObjGrpDtoList" ofType="com.melip.webservices.dto.layout.LayoutScreenObjGrpDto">
       <id property="layoutObjGrpId" column="layoutObjGrpId" />
-      <result property="createDatetime" column="layoutObjGrpCreateDatetime" />
-      <result property="createUser" column="layoutObjGrpCreateUser" />
-      <result property="updateDatetime" column="layoutObjGrpUpdateDatetime" />
-      <result property="updateUser" column="layoutObjGrpUpdateUser" />
-      <result property="sts" column="layoutObjGrpSts" />
-      <result property="alias" column="layoutObjGrpAlias" />
-      <result property="layoutId" column="layoutObjGrpLayoutId" />
+      <result property="layoutObjGrpAlias" column="layoutObjGrpAlias" />
       <result property="multiplicity" column="layoutObjGrpMultiplicity" />
-    </association>
-    <association property="layoutObj" javaType="com.melip.webservices.entity.LayoutObj">
-      <id property="layoutObjId" column="layoutObjId" />
-      <result property="createDatetime" column="layoutObjCreateDatetime" />
-      <result property="createUser" column="layoutObjCreateUser" />
-      <result property="updateDatetime" column="layoutObjUpdateDatetime" />
-      <result property="updateUser" column="layoutObjUpdateUser" />
-      <result property="sts" column="layoutObjSts" />
-      <result property="alias" column="layoutObjAlias" />
-      <result property="layoutObjGrpId" column="layoutObjLayoutObjGrpId" />
-      <result property="nm" column="layoutObjNm" />
-      <result property="type" column="layoutObjType" />
-    </association>
-    <association property="screen" javaType="com.melip.webservices.entity.Screen">
-      <id property="screenId" column="screenId" />
-      <result property="createDatetime" column="screenCreateDatetime" />
-      <result property="createUser" column="screenCreateUser" />
-      <result property="updateDatetime" column="screenUpdateDatetime" />
-      <result property="updateUser" column="screenUpdateUser" />
-      <result property="sts" column="screenSts" />
-      <result property="regionId" column="screenRegionId" />
-      <result property="layoutId" column="screenLayoutId" />
-      <result property="targetEntity" column="screenTargetEntity" />
-      <result property="nm" column="screenNm" />
-    </association>
-    <association property="screenObj" javaType="com.melip.webservices.entity.ScreenObj">
-      <id property="screenObjId" column="screenObjId" />
-      <result property="createDatetime" column="screenObjCreateDatetime" />
-      <result property="createUser" column="screenObjCreateUser" />
-      <result property="updateDatetime" column="screenObjUpdateDatetime" />
-      <result property="updateUser" column="screenObjUpdateUser" />
-      <result property="sts" column="screenObjSts" />
-      <result property="screenId" column="screenObjScreenId" />
-      <result property="layoutObjId" column="screenObjLayoutObjId" />
-      <result property="entity" column="screenObjEntity" />
-      <result property="attrGrpId" column="screenObjAttrGrpId" />
-      <result property="displayNum" column="screenObjDisplayNum" />
-      <result property="targetScreenId" column="screenObjTargetScreenId" />
-    </association>
+      <result property="screenObjGrpId" column="screenObjGrpId" />
+      <result property="screenObjGrpEntity" column="screenObjGrpEntity" />
+      <result property="targetScreenId" column="screenObjGrpTargetScreenId" />
+      <collection property="layoutScreenObjDtoList" ofType="com.melip.webservices.dto.layout.LayoutScreenObjDto">
+        <id property="layoutObjId" column="layoutObjId" />
+        <result property="layoutObjAlias" column="layoutObjAlias" />
+        <result property="layoutObjNm" column="layoutObjNm" />
+        <result property="layoutObjType" column="layoutObjType" />
+        <result property="screenObjId" column="screenObjId" />
+        <collection property="screenObjAttrDtoList" ofType="com.melip.webservices.dto.layout.ScreenObjAttrDto">
+          <id property="screenObjAttrId" column="screenObjAttrId" />
+          <result property="screenObjAttrEntity" column="screenObjAttrEntity" />
+          <result property="attrGrpId" column="screenObjAttrAttrGrpId" />
+          <result property="displayNum" column="screenObjAttrDisplayNum" />
+          <result property="targetScreenId" column="screenObjAttrTargetScreenId" />
+        </collection>
+      </collection>
+    </collection>
   </resultMap>
 
   <!-- レイアウト・スクリーン情報取得 -->
@@ -76,61 +46,48 @@
   <!-- TODO:同じforeachを何度も書くのが嫌だ。（他のmapperも同様） -->
 
     select
-        l.LAYOUT_ID           as layoutId
-      , l.CREATE_DATETIME     as layoutCreateDatetime
-      , l.CREATE_USER         as layoutCreateUser
-      , l.UPDATE_DATETIME     as layoutUpdateDatetime
-      , l.UPDATE_USER         as layoutUpdateUser
-      , l.STS                 as layoutSts
-      , l.ALIAS               as layoutAlias
-      , l.NM                  as layoutNm
-      , l.TYPE                as layoutType
-      , log.LAYOUT_OBJ_GRP_ID as layoutObjGrpId
-      , log.CREATE_DATETIME   as layoutObjGrpCreateDatetime
-      , log.CREATE_USER       as layoutObjGrpCreateUser
-      , log.UPDATE_DATETIME   as layoutObjGrpUpdateDatetime
-      , log.UPDATE_USER       as layoutObjGrpUpdateUser
-      , log.STS               as layoutObjGrpSts
-      , log.ALIAS             as layoutObjGrpAlias
-      , log.LAYOUT_ID         as layoutObjGrpLayoutId
-      , log.MULTIPLICITY      as layoutObjGrpMultiplicity
-      , lo.LAYOUT_OBJ_ID      as layoutObjId
-      , lo.CREATE_DATETIME    as layoutObjCreateDatetime
-      , lo.CREATE_USER        as layoutObjCreateUser
-      , lo.UPDATE_DATETIME    as layoutObjUpdateDatetime
-      , lo.UPDATE_USER        as layoutObjUpdateUser
-      , lo.STS                as layoutObjSts
-      , lo.ALIAS              as layoutObjAlias
-      , lo.LAYOUT_OBJ_GRP_ID  as layoutObjLayoutObjGrpId
-      , lo.NM                 as layoutObjNm
-      , lo.TYPE               as layoutObjType
-      , s.SCREEN_ID           as screenId
-      , s.CREATE_DATETIME     as screenCreateDatetime
-      , s.CREATE_USER         as screenCreateUser
-      , s.UPDATE_DATETIME     as screenUpdateDatetime
-      , s.UPDATE_USER         as screenUpdateUser
-      , s.STS                 as screenSts
-      , s.REGION_ID           as screenRegionId
-      , s.LAYOUT_ID           as screenLayoutId
-      , s.TARGET_ENTITY       as screenTargetEntity
-      , s.NM                  as screenNm
-      , so.SCREEN_OBJ_ID      as screenObjId
-      , so.CREATE_DATETIME    as screenObjCreateDatetime
-      , so.CREATE_USER        as screenObjCreateUser
-      , so.UPDATE_DATETIME    as screenObjUpdateDatetime
-      , so.UPDATE_USER        as screenObjUpdateUser
-      , so.STS                as screenObjSts
-      , so.SCREEN_ID          as screenObjScreenId
-      , so.LAYOUT_OBJ_ID      as screenObjLayoutObjId
-      , so.ENTITY             as screenObjEntity
-      , so.ATTR_GRP_ID        as screenObjAttrGrpId
-      , so.DISPLAY_NUM        as screenObjDisplayNum
-      , so.TARGET_SCREEN_ID   as screenObjTargetScreenId 
+        l.LAYOUT_ID            as layoutId
+      , l.ALIAS                as layoutAlias
+      , l.NM                   as layoutNm
+      , l.TYPE                 as layoutType
+      , cd1.CD_ALIAS           as layoutTypeCdAlias
+      , s.SCREEN_ID            as screenId
+      , s.REGION_ID            as screenRegionId
+      , s.ENTITY               as screenEntity
+      , s.NM                   as screenNm
+      , log.LAYOUT_OBJ_GRP_ID  as layoutObjGrpId
+      , log.ALIAS              as layoutObjGrpAlias
+      , log.MULTIPLICITY       as layoutObjGrpMultiplicity
+      , sog.SCREEN_OBJ_GRP_ID  as screenObjGrpId
+      , sog.ENTITY             as screenObjGrpEntity
+      , sog.TARGET_SCREEN_ID   as screenObjGrpTargetScreenId
+      , lo.LAYOUT_OBJ_ID       as layoutObjId
+      , lo.ALIAS               as layoutObjAlias
+      , lo.NM                  as layoutObjNm
+      , lo.TYPE                as layoutObjType
+      , so.SCREEN_OBJ_ID       as screenObjId
+      , soa.SCREEN_OBJ_ATTR_ID as screenObjAttrId
+      , soa.ENTITY             as screenObjAttrEntity
+      , soa.ATTR_GRP_ID        as screenObjAttrAttrGrpId
+      , soa.DISPLAY_NUM        as screenObjAttrDisplayNum
+      , soa.TARGET_SCREEN_ID   as screenObjAttrTargetScreenId 
     from
       m_screen s 
+      inner join m_screen_obj_grp sog 
+        on s.SCREEN_ID = sog.SCREEN_ID 
+        and sog.STS in
+        <foreach collection="stsArray" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach> 
       inner join m_screen_obj so 
-        on s.SCREEN_ID = so.SCREEN_ID 
+        on sog.SCREEN_OBJ_GRP_ID = so.SCREEN_OBJ_GRP_ID 
         and so.STS in
+        <foreach collection="stsArray" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach> 
+      inner join m_screen_obj_attr soa 
+        on so.SCREEN_OBJ_ID = soa.SCREEN_OBJ_ID 
+        and soa.STS in
         <foreach collection="stsArray" item="item" open="(" separator="," close=")">
           #{item}
         </foreach> 
@@ -152,24 +109,24 @@
         <foreach collection="stsArray" item="item" open="(" separator="," close=")">
           #{item}
         </foreach> 
+      left outer join v_cd cd1 
+        on cd1.CD_GRP_ID = '3' 
+        and l.TYPE = cd1.CD 
+        and cd1.LANG_DIV in
+        <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach> 
     where
-      s.SCREEN_ID = ( 
-        select
-            TARGET_SCREEN_ID 
-        from
-          m_screen_obj 
-        where
-          SCREEN_OBJ_ID = #{screenObjId}
-      ) 
-      and s.sts in
+      s.STS in
       <foreach collection="stsArray" item="item" open="(" separator="," close=")">
         #{item}
       </foreach> 
+      and s.SCREEN_ID = #{targetScreenId}
     order by
-      l.LAYOUT_ID
-      , log.LAYOUT_OBJ_GRP_ID
-      , lo.LAYOUT_OBJ_ID
+      s.SCREEN_ID
+      , sog.SCREEN_OBJ_GRP_ID
       , so.SCREEN_OBJ_ID
+      , soa.DISPLAY_NUM
 
   </select>
 
