@@ -3,12 +3,12 @@ package com.melip.webservices.service.facility;
 import java.util.List;
 
 import com.melip.webservices.dto.facility.FacilityDto;
-import com.melip.webservices.service.common.AbstractService;
+import com.melip.webservices.service.common.AbstractDataService;
 
 /**
  * 施設のサービスクラスです。
  */
-public class FacilityService extends AbstractService implements IFacilityService {
+public class FacilityService extends AbstractDataService implements IFacilityService {
 
   /** 施設情報取得SQL_ID */
   private String selectFacilitySqlId;
@@ -51,8 +51,7 @@ public class FacilityService extends AbstractService implements IFacilityService
     condition.setLangDiv(langDiv);
     condition.setRegionId(regionId);
     condition.setFacilityAttrGrpId(facilityAttrGrpId);
-    List<FacilityDto> facilityDtoList =
-        getSession().selectList(getSelectFacilitySqlId(), condition);
+    List<FacilityDto> facilityDtoList = selectList(getSelectFacilitySqlId(), condition);
     return facilityDtoList;
   }
 
@@ -76,7 +75,7 @@ public class FacilityService extends AbstractService implements IFacilityService
     condition.setLangDiv(langDiv);
     condition.setFacilityId(facilityId);
     condition.setFacilityAttrGrpId(facilityAttrGrpId);
-    FacilityDto facilityDto = getSession().selectOne(getSelectFacilitySqlId(), condition);
+    FacilityDto facilityDto = selectOne(getSelectFacilitySqlId(), condition);
     return facilityDto;
   }
 

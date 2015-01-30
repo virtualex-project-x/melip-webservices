@@ -16,14 +16,14 @@ import com.melip.webservices.dto.layout.LayoutScreenObjDto;
 import com.melip.webservices.dto.layout.LayoutScreenObjGrpDto;
 import com.melip.webservices.dto.layout.ScreenObjAttrDto;
 import com.melip.webservices.dto.region.RegionDto;
-import com.melip.webservices.service.common.AbstractService;
+import com.melip.webservices.service.common.AbstractDataService;
 import com.melip.webservices.service.facility.IFacilityService;
 import com.melip.webservices.service.region.IRegionService;
 
 /**
  * レイアウトのサービスクラスです。
  */
-public class LayoutService extends AbstractService implements ILayoutService {
+public class LayoutService extends AbstractDataService implements ILayoutService {
 
   /** レイアウト・スクリーン情報取得SQL_ID */
   private String selectLayoutScreenSqlId;
@@ -59,8 +59,7 @@ public class LayoutService extends AbstractService implements ILayoutService {
     LayoutSearchCondition condition = new LayoutSearchCondition();
     condition.setLangDiv(langDiv);
     condition.setTargetScreenId(targetScreenId);
-    LayoutScreenDto layoutScreenDto =
-        getSession().selectOne(getSelectLayoutScreenSqlId(), condition);
+    LayoutScreenDto layoutScreenDto = selectOne(getSelectLayoutScreenSqlId(), condition);
 
     return createScreenDto(layoutScreenDto);
   }

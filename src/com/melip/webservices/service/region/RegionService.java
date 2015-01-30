@@ -3,12 +3,12 @@ package com.melip.webservices.service.region;
 import java.util.List;
 
 import com.melip.webservices.dto.region.RegionDto;
-import com.melip.webservices.service.common.AbstractService;
+import com.melip.webservices.service.common.AbstractDataService;
 
 /**
  * 地域のサービスクラスです。
  */
-public class RegionService extends AbstractService implements IRegionService {
+public class RegionService extends AbstractDataService implements IRegionService {
 
   /** 地域情報取得SQL_ID */
   private String selectRegionSqlId;
@@ -31,7 +31,7 @@ public class RegionService extends AbstractService implements IRegionService {
     RegionSearchCondition condition = new RegionSearchCondition();
     condition.setLangDiv(langDiv);
     condition.setRegionAttrGrpId(regionAttrGrpId);
-    List<RegionDto> regionDtoList = getSession().selectList(getSelectRegionSqlId(), condition);
+    List<RegionDto> regionDtoList = selectList(getSelectRegionSqlId(), condition);
     return regionDtoList;
   }
 
@@ -55,7 +55,7 @@ public class RegionService extends AbstractService implements IRegionService {
     condition.setLangDiv(langDiv);
     condition.setRegionId(regionId);
     condition.setRegionAttrGrpId(regionAttrGrpId);
-    RegionDto regionDto = getSession().selectOne(getSelectRegionSqlId(), condition);
+    RegionDto regionDto = selectOne(getSelectRegionSqlId(), condition);
     return regionDto;
   }
 
