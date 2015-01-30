@@ -28,23 +28,21 @@ public class LayoutService extends AbstractService implements ILayoutService {
   /** レイアウト・スクリーン情報取得SQL_ID */
   private String selectLayoutScreenSqlId;
 
-  /** 言語区分 */
-  private String langDiv;
-  /** 対象スクリーンID */
-  private Integer targetScreenId;
-  /** 地域ID */
-  private Integer regionId;
-  /** 施設ID */
-  private Integer facilityId;
-  /** 施設グループID */
-  private Integer facilityGrpId;
+  /** 言語区分（パラメータ） */
+  private String prmLangDiv;
+  /** 対象スクリーンID（パラメータ） */
+  private Integer prmTargetScreenId;
+  /** 地域ID（パラメータ） */
+  private Integer prmRegionId;
+  /** 施設ID（パラメータ） */
+  private Integer prmFacilityId;
+  /** 施設グループID（パラメータ） */
+  private Integer prmFacilityGrpId;
 
   /** 地域DTO */
   private RegionDto regionDto;
   /** 施設DTOリスト */
   private List<FacilityDto> facilityDtoList;
-
-  // TODO:地域DTOと施設DTOを分けなくてもいいのでは。（IDとAttrDtoのリストを持つ）
 
   /**
    * @see com.melip.webservices.service.layout.ILayoutService#getScreenDto(java.lang.String,
@@ -57,11 +55,13 @@ public class LayoutService extends AbstractService implements ILayoutService {
     // パラメータ設定
     setParameters(langDiv, targetScreenId, regionId, facilityId, facilityGrpId);
 
+    // レイアウト・スクリーン情報取得
     LayoutSearchCondition condition = new LayoutSearchCondition();
     condition.setLangDiv(langDiv);
     condition.setTargetScreenId(targetScreenId);
     LayoutScreenDto layoutScreenDto =
         getSession().selectOne(getSelectLayoutScreenSqlId(), condition);
+
     return createScreenDto(layoutScreenDto);
   }
 
@@ -77,20 +77,16 @@ public class LayoutService extends AbstractService implements ILayoutService {
   private void setParameters(String langDiv, Integer targetScreenId, Integer regionId,
       Integer facilityId, Integer facilityGrpId) {
 
-    setLangDiv(langDiv);
-    setTargetScreenId(targetScreenId);
-    setRegionId(regionId);
-    setFacilityId(facilityId);
+    setPrmLangDiv(langDiv);
+    setPrmTargetScreenId(targetScreenId);
+    setPrmRegionId(regionId);
+    setPrmFacilityId(facilityId);
     setFacilityGrpId(facilityGrpId);
   }
 
   /**
-   * レイアウト・スクリーン情報を元にスクリーンDTOを生成します。
+   * スクリーンDTOを生成します。
    * 
-   * @param langDiv 言語区分
-   * @param regionId 地域ID
-   * @param facilityId 施設ID
-   * @param facilityGrpId 施設グループID
    * @param layoutScreenDto レイアウト・スクリーン情報
    * @return スクリーンDTO
    */
@@ -103,21 +99,23 @@ public class LayoutService extends AbstractService implements ILayoutService {
     screenDto.setScreenId(layoutScreenDto.getScreenId());
     screenDto.setScreenObjGrpDtoList(createScreenObjGrpDtoList(layoutScreenDto
         .getLayoutScreenObjGrpDtoList()));
+
     return screenDto;
   }
 
+  /**
+   * スクリーンオブジェクトグループDTOリストを生成します。
+   * 
+   * @param layoutScreenObjGrpDtoList レイアウト・スクリーンオブジェクトグループDTOリスト
+   * @return スクリーンオブジェクトグループDTOリスト
+   */
   private List<ScreenObjGrpDto> createScreenObjGrpDtoList(
       List<LayoutScreenObjGrpDto> layoutScreenObjGrpDtoList) {
 
     List<ScreenObjGrpDto> screenObjGrpDtoList = new ArrayList<ScreenObjGrpDto>();
 
     for (LayoutScreenObjGrpDto layoutScreenObjGrpDto : layoutScreenObjGrpDtoList) {
-      ScreenObjGrpDto screenObjGrpDto = new ScreenObjGrpDto();
-      screenObjGrpDto.setLayoutObjGrpId(layoutScreenObjGrpDto.getLayoutObjGrpId());
-      screenObjGrpDto.setLayoutObjGrpAlias(layoutScreenObjGrpDto.getLayoutObjGrpAlias());
-      screenObjGrpDto.setMultiplicity(layoutScreenObjGrpDto.getMultiplicity());
-      screenObjGrpDto.setScreenObjGrpId(layoutScreenObjGrpDto.getScreenObjGrpId());
-      screenObjGrpDto.setTargetScreenId(layoutScreenObjGrpDto.getTargetScreenId());
+      ScreenObjGrpDto screenObjGrpDto = createScreenObjGrpDto(layoutScreenObjGrpDto);
 
       String screenObjGrpEntity = layoutScreenObjGrpDto.getScreenObjGrpEntity();
       // 地域の場合
@@ -147,18 +145,49 @@ public class LayoutService extends AbstractService implements ILayoutService {
     return screenObjGrpDtoList;
   }
 
+  /**
+   * スクリーンオブジェクトグループDTOを生成します。
+   * 
+   * @param layoutScreenObjGrpDto レイアウト・オブジェクトグループDTO
+   * @return スクリーンオブジェクトグループDTO
+   */
+  private ScreenObjGrpDto createScreenObjGrpDto(LayoutScreenObjGrpDto layoutScreenObjGrpDto) {
+
+    ScreenObjGrpDto screenObjGrpDto = new ScreenObjGrpDto();
+    screenObjGrpDto.setLayoutObjGrpId(layoutScreenObjGrpDto.getLayoutObjGrpId());
+    screenObjGrpDto.setLayoutObjGrpAlias(layoutScreenObjGrpDto.getLayoutObjGrpAlias());
+    screenObjGrpDto.setMultiplicity(layoutScreenObjGrpDto.getMultiplicity());
+    screenObjGrpDto.setScreenObjGrpId(layoutScreenObjGrpDto.getScreenObjGrpId());
+    screenObjGrpDto.setTargetScreenId(layoutScreenObjGrpDto.getTargetScreenId());
+    screenObjGrpDto.setScreenObjBunchDtoList(new ArrayList<ScreenObjBunchDto>());
+
+    return screenObjGrpDto;
+  }
+
+  /**
+   * 地域用のスクリーンオブジェクトバンチDTOリストを生成します。
+   * 
+   * @param layoutScreenObjDtoList レイアウト・スクリーンオブジェクトDTOリスト
+   * @return スクリーンオブジェクトバンチDTOリスト
+   */
   private List<ScreenObjBunchDto> createRegionScreenObjBunchDtoList(
       List<LayoutScreenObjDto> layoutScreenObjDtoList) {
 
     List<ScreenObjBunchDto> screenObjBunchDtoList = new ArrayList<ScreenObjBunchDto>();
-    ScreenObjBunchDto screenObjBunchDto = new ScreenObjBunchDto();
-    screenObjBunchDto.setRegionId(getRegionId());
-    screenObjBunchDto.setScreenObjDtoList(createRegionScreenObjDtoList(layoutScreenObjDtoList));
+    ScreenObjBunchDto screenObjBunchDto = createScreenObjBunchDto(getPrmRegionId(), null, null);
+    screenObjBunchDto.setScreenObjDtoList(createScreenObjDtoList(layoutScreenObjDtoList,
+        getPrmRegionId()));
     screenObjBunchDtoList.add(screenObjBunchDto);
 
     return screenObjBunchDtoList;
   }
 
+  /**
+   * 施設用のスクリーンオブジェクトバンチDTOリストを生成します。
+   * 
+   * @param layoutScreenObjDtoList レイアウト・スクリーンオブジェクトDTOリスト
+   * @return スクリーンオブジェクトバンチDTOリスト
+   */
   private List<ScreenObjBunchDto> createFacilityScreenObjBunchDtoList(
       List<LayoutScreenObjDto> layoutScreenObjDtoList) {
 
@@ -166,69 +195,86 @@ public class LayoutService extends AbstractService implements ILayoutService {
 
     List<FacilityDto> facilityDtoList = getFacilityDtoList();
     for (FacilityDto facilityDto : facilityDtoList) {
-      ScreenObjBunchDto screenObjBunchDto = new ScreenObjBunchDto();
-      screenObjBunchDto.setRegionId(getRegionId());
-      screenObjBunchDto.setFacilityId(facilityDto.getFacilityId());
-      screenObjBunchDto.setScreenObjDtoList(createFacilityScreenObjDtoList(
-          facilityDto.getFacilityId(), layoutScreenObjDtoList));
+      ScreenObjBunchDto screenObjBunchDto =
+          createScreenObjBunchDto(getPrmRegionId(), null, facilityDto.getFacilityId());
+      screenObjBunchDto.setScreenObjDtoList(createScreenObjDtoList(layoutScreenObjDtoList,
+          facilityDto.getFacilityId()));
       screenObjBunchDtoList.add(screenObjBunchDto);
     }
 
     return screenObjBunchDtoList;
   }
 
-  private List<ScreenObjDto> createRegionScreenObjDtoList(
-      List<LayoutScreenObjDto> layoutScreenObjDtoList) {
+  /**
+   * スクリーンオブジェクトバンチDTOを生成します。
+   * 
+   * @param regionId 地域ID
+   * @param facilityGrpId 施設グループID
+   * @param facilityId 施設ID
+   * @return スクリーンオブジェクトバンチDTO
+   */
+  private ScreenObjBunchDto createScreenObjBunchDto(Integer regionId, Integer facilityGrpId,
+      Integer facilityId) {
+
+    ScreenObjBunchDto screenObjBunchDto = new ScreenObjBunchDto();
+    screenObjBunchDto.setRegionId(regionId);
+    screenObjBunchDto.setFacilityGrpId(facilityGrpId);
+    screenObjBunchDto.setFacilityId(facilityId);
+    screenObjBunchDto.setScreenObjDtoList(new ArrayList<ScreenObjDto>());
+
+    return screenObjBunchDto;
+  }
+
+  /**
+   * スクリーンオブジェクトDTOリストを生成します。
+   * 
+   * @param layoutScreenObjDtoList レイアウト・スクリーンオブジェクトDTOリスト
+   * @param targetId 対象のID
+   * @return スクリーンオブジェクトDTOリスト
+   */
+  private List<ScreenObjDto> createScreenObjDtoList(
+      List<LayoutScreenObjDto> layoutScreenObjDtoList, Integer targetId) {
 
     List<ScreenObjDto> screenObjDtoList = new ArrayList<ScreenObjDto>();
 
     for (LayoutScreenObjDto layoutScreenObjDto : layoutScreenObjDtoList) {
-      ScreenObjDto screenObjDto = new ScreenObjDto();
-      screenObjDto.setLayoutObjId(layoutScreenObjDto.getLayoutObjId());
-      screenObjDto.setLayoutObjAlias(layoutScreenObjDto.getLayoutObjAlias());
-      screenObjDto.setLayoutObjType(layoutScreenObjDto.getLayoutObjType());
-      screenObjDto.setScreenObjId(layoutScreenObjDto.getScreenObjId());
-      screenObjDto.setAttrDtoList(createRegionAttrDtoList(layoutScreenObjDto
-          .getScreenObjAttrDtoList()));
+      ScreenObjDto screenObjDto = createScreenObjDto(layoutScreenObjDto);
+      screenObjDto.setAttrDtoList(createAttrDtoList(layoutScreenObjDto.getScreenObjAttrDtoList(),
+          targetId));
       screenObjDtoList.add(screenObjDto);
     }
 
     return screenObjDtoList;
   }
 
-  private List<ScreenObjDto> createFacilityScreenObjDtoList(Integer facilityId,
-      List<LayoutScreenObjDto> layoutScreenObjDtoList) {
+  /**
+   * スクリーンオブジェクトDTOを生成します。
+   * 
+   * @param layoutScreenObjDto レイアウト・スクリーンオブジェクトDTO
+   * @return スクリーンオブジェクトDTO
+   */
+  private ScreenObjDto createScreenObjDto(LayoutScreenObjDto layoutScreenObjDto) {
 
-    List<ScreenObjDto> screenObjDtoList = new ArrayList<ScreenObjDto>();
+    ScreenObjDto screenObjDto = new ScreenObjDto();
+    screenObjDto.setLayoutObjId(layoutScreenObjDto.getLayoutObjId());
+    screenObjDto.setLayoutObjAlias(layoutScreenObjDto.getLayoutObjAlias());
+    screenObjDto.setLayoutObjType(layoutScreenObjDto.getLayoutObjType());
+    screenObjDto.setScreenObjId(layoutScreenObjDto.getScreenObjId());
+    screenObjDto.setAttrDtoList(new ArrayList<AttrDto>());
 
-    for (LayoutScreenObjDto layoutScreenObjDto : layoutScreenObjDtoList) {
-      ScreenObjDto screenObjDto = new ScreenObjDto();
-      screenObjDto.setLayoutObjId(layoutScreenObjDto.getLayoutObjId());
-      screenObjDto.setLayoutObjAlias(layoutScreenObjDto.getLayoutObjAlias());
-      screenObjDto.setLayoutObjType(layoutScreenObjDto.getLayoutObjType());
-      screenObjDto.setScreenObjId(layoutScreenObjDto.getScreenObjId());
-      screenObjDto.setAttrDtoList(createFacilityAttrDtoList(facilityId,
-          layoutScreenObjDto.getScreenObjAttrDtoList()));
-      screenObjDtoList.add(screenObjDto);
-    }
-
-    return screenObjDtoList;
+    return screenObjDto;
   }
 
-  private List<AttrDto> createRegionAttrDtoList(List<ScreenObjAttrDto> screenObjAttrDtoList) {
-
-    List<AttrDto> attrDtoList = new ArrayList<AttrDto>();
-
-    for (ScreenObjAttrDto screenObjAttrDto : screenObjAttrDtoList) {
-      attrDtoList.add(createRegionAttrDto(screenObjAttrDto.getAttrGrpId(),
-          screenObjAttrDto.getTargetScreenId()));
-    }
-
-    return attrDtoList;
-  }
-
-  private List<AttrDto> createFacilityAttrDtoList(Integer facilityId,
-      List<ScreenObjAttrDto> screenObjAttrDtoList) {
+  /**
+   * 属性DTOリストを生成します。
+   * 
+   * @param screenObjAttrDtoList スクリーンオブジェクト属性DTOリスト
+   * @param targetId 対象のID<br>
+   *        （地域ID、施設ID、施設グループID）
+   * @return 属性DTOリスト
+   */
+  private List<AttrDto> createAttrDtoList(List<ScreenObjAttrDto> screenObjAttrDtoList,
+      Integer targetId) {
 
     List<AttrDto> attrDtoList = new ArrayList<AttrDto>();
 
@@ -236,52 +282,76 @@ public class LayoutService extends AbstractService implements ILayoutService {
       String screenObjAttrEntity = screenObjAttrDto.getScreenObjAttrEntity();
       // 地域の場合
       if (CodeConstants.CODE_ENTITY_REGION.equals(screenObjAttrEntity)) {
-        attrDtoList.add(createRegionAttrDto(screenObjAttrDto.getAttrGrpId(),
-            screenObjAttrDto.getTargetScreenId()));
+        attrDtoList.add(createRegionAttrDto(screenObjAttrDto, screenObjAttrDto.getAttrGrpId()));
       }
       // 施設の場合
       else if (CodeConstants.CODE_ENTITY_FACILITY.equals(screenObjAttrEntity)) {
-        attrDtoList.add(createFacilityAttrDto(facilityId, screenObjAttrDto.getAttrGrpId(),
-            screenObjAttrDto.getTargetScreenId()));
+        attrDtoList.add(createFacilityAttrDto(screenObjAttrDto, screenObjAttrDto.getAttrGrpId(),
+            targetId));
       }
+      // TODO:施設グループ、施設_施設グループ_リンクの場合
     }
 
     return attrDtoList;
   }
 
-  private AttrDto createFacilityAttrDto(Integer facilityId, Integer attrGrpId,
-      Integer targetScreenId) {
+  /**
+   * 地域用の属性DTOを生成します。
+   * 
+   * @param screenObjAttrDto スクリーンオブジェクト属性DTO
+   * @param attrGrpId 属性グループID
+   * @return 属性DTO
+   */
+  private AttrDto createRegionAttrDto(ScreenObjAttrDto screenObjAttrDto, Integer attrGrpId) {
+
+    List<AttrDto> attrDtoList = getRegionDto().getAttrDtoList();
+    return createAttrDto(screenObjAttrDto, attrGrpId, attrDtoList);
+  }
+
+  /**
+   * 施設用の属性DTOを生成します。
+   * 
+   * @param screenObjAttrDto スクリーンオブジェクト属性DTO
+   * @param attrGrpId 属性グループID
+   * @param facilityId 施設ID
+   * @return 属性DTO
+   */
+  private AttrDto createFacilityAttrDto(ScreenObjAttrDto screenObjAttrDto, Integer attrGrpId,
+      Integer facilityId) {
+
+    AttrDto attrDto = null;
 
     List<FacilityDto> facilityDtoList = getFacilityDtoList();
     for (FacilityDto facilityDto : facilityDtoList) {
       if (facilityId.equals(facilityDto.getFacilityId())) {
         List<AttrDto> attrDtoList = facilityDto.getAttrDtoList();
-        for (AttrDto attrDto : attrDtoList) {
-          if (attrGrpId.equals(attrDto.getAttrGrpId())) {
-            attrDto.setTargetScreenId(targetScreenId);
-            return attrDto;
-          }
-        }
+        attrDto = createAttrDto(screenObjAttrDto, attrGrpId, attrDtoList);
       }
     }
 
-    return null;
+    return attrDto;
   }
 
-  private AttrDto createRegionAttrDto(Integer attrGrpId, Integer targetScreenId) {
+  /**
+   * 属性DTOを生成します。
+   * 
+   * @param screenObjAttrDto スクリーンオブジェクト属性DTO
+   * @param attrGrpId 属性グループID
+   * @param attrDtoList 属性DTOリスト
+   * @return 属性DTO
+   */
+  private AttrDto createAttrDto(ScreenObjAttrDto screenObjAttrDto, Integer attrGrpId,
+      List<AttrDto> attrDtoList) {
 
-    List<AttrDto> attrDtoList = getRegionDto().getAttrDtoList();
     for (AttrDto attrDto : attrDtoList) {
       if (attrGrpId.equals(attrDto.getAttrGrpId())) {
-        attrDto.setTargetScreenId(targetScreenId);
+        attrDto.setTargetScreenId(screenObjAttrDto.getTargetScreenId());
         return attrDto;
       }
     }
 
     return null;
   }
-
-
 
   /**
    * レイアウト・スクリーン情報取得SQL_IDを取得します。
@@ -302,93 +372,93 @@ public class LayoutService extends AbstractService implements ILayoutService {
   }
 
   /**
-   * 言語区分を取得します。
+   * 言語区分（パラメータ）を取得します。
    * 
-   * @return 言語区分
+   * @return 言語区分（パラメータ）
    */
-  public String getLangDiv() {
-    return langDiv;
+  public String getPrmLangDiv() {
+    return prmLangDiv;
   }
 
   /**
-   * 言語区分を設定します。
+   * 言語区分（パラメータ）を設定します。
    * 
-   * @param langDiv 言語区分
+   * @param prmLangDiv 言語区分（パラメータ）
    */
-  public void setLangDiv(String langDiv) {
-    this.langDiv = langDiv;
+  public void setPrmLangDiv(String prmLangDiv) {
+    this.prmLangDiv = prmLangDiv;
   }
 
   /**
-   * 対象スクリーンIDを取得します。
+   * 対象スクリーンID（パラメータ）を取得します。
    * 
-   * @return 対象スクリーンID
+   * @return 対象スクリーンID（パラメータ）
    */
-  public Integer getTargetScreenId() {
-    return targetScreenId;
+  public Integer getPrmTargetScreenId() {
+    return prmTargetScreenId;
   }
 
   /**
-   * 対象スクリーンIDを設定します。
+   * 対象スクリーンID（パラメータ）を設定します。
    * 
-   * @param targetScreenId 対象スクリーンID
+   * @param prmTargetScreenId 対象スクリーンID（パラメータ）
    */
-  public void setTargetScreenId(Integer targetScreenId) {
-    this.targetScreenId = targetScreenId;
+  public void setPrmTargetScreenId(Integer prmTargetScreenId) {
+    this.prmTargetScreenId = prmTargetScreenId;
   }
 
   /**
-   * 地域IDを取得します。
+   * 地域ID（パラメータ）を取得します。
    * 
-   * @return 地域ID
+   * @return 地域ID（パラメータ）
    */
-  public Integer getRegionId() {
-    return regionId;
+  public Integer getPrmRegionId() {
+    return prmRegionId;
   }
 
   /**
-   * 地域IDを設定します。
+   * 地域ID（パラメータ）を設定します。
    * 
-   * @param regionId 地域ID
+   * @param prmRegionId 地域ID（パラメータ）
    */
-  public void setRegionId(Integer regionId) {
-    this.regionId = regionId;
+  public void setPrmRegionId(Integer prmRegionId) {
+    this.prmRegionId = prmRegionId;
   }
 
   /**
-   * 施設IDを取得します。
+   * 施設ID（パラメータ）を取得します。
    * 
-   * @return 施設ID
+   * @return 施設ID（パラメータ）
    */
-  public Integer getFacilityId() {
-    return facilityId;
+  public Integer getPrmFacilityId() {
+    return prmFacilityId;
   }
 
   /**
-   * 施設IDを設定します。
+   * 施設ID（パラメータ）を設定します。
    * 
-   * @param facilityId 施設ID
+   * @param prmFacilityId 施設ID（パラメータ）
    */
-  public void setFacilityId(Integer facilityId) {
-    this.facilityId = facilityId;
+  public void setPrmFacilityId(Integer prmFacilityId) {
+    this.prmFacilityId = prmFacilityId;
   }
 
   /**
-   * 施設グループIDを取得します。
+   * 施設グループID（パラメータ）を取得します。
    * 
-   * @return 施設グループID
+   * @return 施設グループID（パラメータ）
    */
-  public Integer getFacilityGrpId() {
-    return facilityGrpId;
+  public Integer getPrmFacilityGrpId() {
+    return prmFacilityGrpId;
   }
 
   /**
-   * 施設グループIDを設定します。
+   * 施設グループID（パラメータ）を設定します。
    * 
-   * @param facilityGrpId 施設グループID
+   * @param prmFacilityGrpId 施設グループID（パラメータ）
    */
-  public void setFacilityGrpId(Integer facilityGrpId) {
-    this.facilityGrpId = facilityGrpId;
+  public void setFacilityGrpId(Integer prmFacilityGrpId) {
+    this.prmFacilityGrpId = prmFacilityGrpId;
   }
 
   /**
@@ -401,7 +471,7 @@ public class LayoutService extends AbstractService implements ILayoutService {
     if (null == regionDto) {
       IRegionService service =
           BeanCreator.getBean(IRegionService.SERVICE_NAME, IRegionService.class);
-      regionDto = service.getRegion(getLangDiv(), getRegionId());
+      regionDto = service.getRegion(getPrmLangDiv(), getPrmRegionId());
     }
 
     return regionDto;
@@ -426,11 +496,11 @@ public class LayoutService extends AbstractService implements ILayoutService {
     if (null == facilityDtoList) {
       IFacilityService service =
           BeanCreator.getBean(IFacilityService.SERVICE_NAME, IFacilityService.class);
-      if (null == getFacilityId()) {
-        facilityDtoList = service.getFacilityListByRegion(getLangDiv(), getRegionId());
+      if (null == getPrmFacilityId()) {
+        facilityDtoList = service.getFacilityListByRegion(getPrmLangDiv(), getPrmRegionId());
       } else {
         facilityDtoList = new ArrayList<FacilityDto>();
-        facilityDtoList.add(service.getFacility(getLangDiv(), getFacilityId()));
+        facilityDtoList.add(service.getFacility(getPrmLangDiv(), getPrmFacilityId()));
       }
     }
 
