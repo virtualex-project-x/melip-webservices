@@ -37,7 +37,7 @@ public class ScreenDtoResource extends AbstractResource {
    * @param regionId 地域ID
    * @param facilityId 施設ID
    * @param facilityGrpId
-   * @return 施設グループID
+   * @return スクリーンDTO（JSON形式）
    */
   @GET
   @Produces(MEDIA_TYPE_JSON)
