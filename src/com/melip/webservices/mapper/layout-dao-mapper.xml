@@ -39,11 +39,25 @@
     </collection>
   </resultMap>
 
+  <!-- ステータスの条件 -->
+  <sql id="stsCondition">
+    in
+    <foreach collection="stsArray" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </sql>
+
+  <!-- 言語区分の条件 -->
+  <sql id="langDivCondition">
+    in
+    <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </sql>
+  
   <!-- レイアウト・スクリーン情報取得 -->
   <select id="selectLayoutScreen" resultMap="layoutScreenDtoResultMap"
     parameterType="com.melip.webservices.service.layout.LayoutSearchCondition" useCache="false">
-
-  <!-- TODO:同じforeachを何度も書くのが嫌だ。（他のmapperも同様） -->
 
     select
         l.LAYOUT_ID            as layoutId
@@ -75,52 +89,28 @@
       m_screen s 
       inner join m_screen_obj_grp sog 
         on s.SCREEN_ID = sog.SCREEN_ID 
-        and sog.STS in
-        <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and sog.STS <include refid="stsCondition"/>
       inner join m_screen_obj so 
         on sog.SCREEN_OBJ_GRP_ID = so.SCREEN_OBJ_GRP_ID 
-        and so.STS in
-        <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and so.STS <include refid="stsCondition"/> 
       inner join m_screen_obj_attr soa 
         on so.SCREEN_OBJ_ID = soa.SCREEN_OBJ_ID 
-        and soa.STS in
-        <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and soa.STS <include refid="stsCondition"/> 
       inner join m_layout_obj lo 
         on so.LAYOUT_OBJ_ID = lo.LAYOUT_OBJ_ID 
-        and lo.STS in
-        <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and lo.STS <include refid="stsCondition"/> 
       inner join m_layout_obj_grp log 
         on lo.LAYOUT_OBJ_GRP_ID = log.LAYOUT_OBJ_GRP_ID 
-        and log.STS in
-        <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and log.STS <include refid="stsCondition"/> 
       inner join m_layout l 
         on log.LAYOUT_ID = l.LAYOUT_ID 
-        and l.STS in
-        <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and l.STS <include refid="stsCondition"/> 
       left outer join v_cd cd1 
         on cd1.CD_GRP_ID = '3' 
         and l.TYPE = cd1.CD 
-        and cd1.LANG_DIV in
-        <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and cd1.LANG_DIV <include refid="langDivCondition"/> 
     where
-      s.STS in
-      <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-        #{item}
-      </foreach> 
+      s.STS <include refid="stsCondition"/> 
       and s.SCREEN_ID = #{targetScreenId}
     order by
       s.SCREEN_ID

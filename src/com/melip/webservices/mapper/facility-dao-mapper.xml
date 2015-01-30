@@ -18,14 +18,25 @@
     </collection>
   </resultMap>
 
+  <!-- ステータスの条件 -->
+  <sql id="stsCondition">
+    in
+    <foreach collection="stsArray" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </sql>
+
+  <!-- 言語区分の条件 -->
+  <sql id="langDivCondition">
+    in
+    <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </sql>
+  
   <!-- 施設情報取得 -->
   <select id="selectFacility" resultMap="facilityDtoResultMap"
     parameterType="com.melip.webservices.service.facility.FacilitySearchCondition" useCache="false">
-
-  <!-- TODO:
-    ・属性グループ種別のコードグループIDの検討
-      パラメータで渡すか？ベタ書きで良いか？
-  -->
 
     select
         a.FACILITY_ID          as facilityId
@@ -57,44 +68,23 @@
           m_facility f 
           inner join m_facility_attr_val fav 
             on f.FACILITY_ID = fav.FACILITY_ID 
-            and fav.STS in
-            <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach>  
+            and fav.STS <include refid="stsCondition"/>
           inner join m_facility_attr_val_lang favl 
             on fav.FACILITY_ATTR_VAL_ID = favl.FACILITY_ATTR_VAL_ID 
-            and favl.LANG_DIV in
-            <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach> 
-            and favl.STS in
-            <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach>  
+            and favl.LANG_DIV <include refid="langDivCondition"/> 
+            and favl.STS <include refid="stsCondition"/>  
           inner join m_facility_attr_grp fag 
             on fav.FACILITY_ATTR_GRP_ID = fag.FACILITY_ATTR_GRP_ID 
-            and fag.STS in
-            <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach>  
+            and fag.STS <include refid="stsCondition"/>  
             <if test="facilityAttrGrpId != null"> 
               and fag.FACILITY_ATTR_GRP_ID = #{facilityAttrGrpId}
             </if>
           inner join m_facility_attr_grp_lang fagl 
             on fag.FACILITY_ATTR_GRP_ID = fagl.FACILITY_ATTR_GRP_ID 
-            and fagl.LANG_DIV in
-            <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach> 
-            and fagl.STS in
-            <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach>  
+            and fagl.LANG_DIV <include refid="langDivCondition"/> 
+            and fagl.STS <include refid="stsCondition"/>  
         where
-          f.STS in
-          <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-            #{item}
-          </foreach>  
+          f.STS <include refid="stsCondition"/>
           <if test="regionId != null"> 
             and f.REGION_ID = #{regionId}
           </if>
@@ -105,10 +95,7 @@
       left outer join v_cd cd1 
         on a.CD_GRP_ID = cd1.CD_GRP_ID 
         and a.VAL = cd1.CD 
-        and cd1.LANG_DIV in
-        <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and cd1.LANG_DIV <include refid="langDivCondition"/> 
     order by
       a.FACILITY_ID
       , a.FACILITY_ATTR_GRP_ID

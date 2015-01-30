@@ -17,14 +17,25 @@
     </collection>
   </resultMap>
 
+  <!-- ステータスの条件 -->
+  <sql id="stsCondition">
+    in
+    <foreach collection="stsArray" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </sql>
+
+  <!-- 言語区分の条件 -->
+  <sql id="langDivCondition">
+    in
+    <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </sql>
+  
   <!-- 地域情報取得 -->
   <select id="selectRegion" resultMap="regionDtoResultMap"
     parameterType="com.melip.webservices.service.region.RegionSearchCondition" useCache="false">
-
-  <!-- TODO:
-    ・属性グループ種別のコードグループIDの検討
-      パラメータで渡すか？ベタ書きで良いか？
-  -->
 
     select
         a.REGION_ID          as regionId
@@ -54,44 +65,23 @@
           m_region r 
           inner join m_region_attr_val rav 
             on r.REGION_ID = rav.REGION_ID 
-            and rav.STS in
-            <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach> 
+            and rav.STS <include refid="stsCondition"/> 
           inner join m_region_attr_val_lang ravl 
             on rav.REGION_ATTR_VAL_ID = ravl.REGION_ATTR_VAL_ID 
-            and ravl.LANG_DIV in
-            <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach> 
-            and ravl.STS in
-            <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach> 
+            and ravl.LANG_DIV <include refid="langDivCondition"/>  
+            and ravl.STS <include refid="stsCondition"/> 
           inner join m_region_attr_grp rag 
             on rav.REGION_ATTR_GRP_ID = rag.REGION_ATTR_GRP_ID 
-            and rag.STS in
-            <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach> 
+            and rag.STS <include refid="stsCondition"/> 
             <if test="regionAttrGrpId != null"> 
               and rag.REGION_ATTR_GRP_ID = #{regionAttrGrpId} 
             </if>
           inner join m_region_attr_grp_lang ragl 
             on rag.REGION_ATTR_GRP_ID = ragl.REGION_ATTR_GRP_ID 
-            and ragl.LANG_DIV in
-            <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach> 
-            and ragl.STS in
-            <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-              #{item}
-            </foreach> 
+            and ragl.LANG_DIV <include refid="langDivCondition"/>  
+            and ragl.STS <include refid="stsCondition"/> 
         where
-          r.STS in
-          <foreach collection="stsArray" item="item" open="(" separator="," close=")">
-            #{item}
-          </foreach> 
+          r.STS <include refid="stsCondition"/> 
           <if test="regionId != null"> 
             and r.REGION_ID = #{regionId} 
           </if>
@@ -99,10 +89,7 @@
       left outer join v_cd cd1 
         on a.CD_GRP_ID = cd1.CD_GRP_ID 
         and a.VAL = cd1.CD 
-        and cd1.LANG_DIV in
-        <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
-          #{item}
-        </foreach> 
+        and cd1.LANG_DIV <include refid="langDivCondition"/>  
     order by
       a.REGION_ID
       , a.REGION_ATTR_GRP_ID
