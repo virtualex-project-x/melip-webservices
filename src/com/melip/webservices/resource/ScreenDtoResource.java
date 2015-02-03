@@ -68,6 +68,8 @@ public class ScreenDtoResource extends AbstractResource {
   private void setParameters(String langDiv, String targetScreenId, String regionId,
       String facilityId, String facilityGrpId) {
 
+    // TODO:必須チェックなど
+
     // 言語区分
     setLangDiv(langDiv);
     // 対象スクリーンID
