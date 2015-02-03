@@ -21,6 +21,14 @@ public class Dao implements IDao {
   /** MyBatis設定ファイル名 */
   private String resourceFileName;
 
+  // TODO:プライベートコンストラクタにも関わらずなぜSpringはインスタンス化できるのか？
+
+  /**
+   * コンストラクタ<br>
+   * シングルトンのためプライベートとします。
+   */
+  private Dao() {}
+
   /**
    * 初期化処理を実施します。<br>
    * MyBatis設定情報を読み込みます。
