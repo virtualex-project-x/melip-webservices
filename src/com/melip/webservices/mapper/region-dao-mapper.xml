@@ -34,8 +34,8 @@
   </sql>
   
   <!-- 地域情報取得 -->
-  <select id="selectRegion" resultMap="regionDtoResultMap"
-    parameterType="com.melip.webservices.service.region.RegionSearchCondition" useCache="false">
+  <select id="selectRegion" resultMap="regionDtoResultMap" parameterType="CONDITION"
+    useCache="false">
 
     select
         a.REGION_ID          as regionId
@@ -73,8 +73,8 @@
           inner join m_region_attr_grp rag 
             on rav.REGION_ATTR_GRP_ID = rag.REGION_ATTR_GRP_ID 
             and rag.STS <include refid="stsCondition"/> 
-            <if test="regionAttrGrpId != null"> 
-              and rag.REGION_ATTR_GRP_ID = #{regionAttrGrpId} 
+            <if test="v.regionAttrGrpId != null"> 
+              and rag.REGION_ATTR_GRP_ID = #{v.regionAttrGrpId} 
             </if>
           inner join m_region_attr_grp_lang ragl 
             on rag.REGION_ATTR_GRP_ID = ragl.REGION_ATTR_GRP_ID 
@@ -82,8 +82,8 @@
             and ragl.STS <include refid="stsCondition"/> 
         where
           r.STS <include refid="stsCondition"/> 
-          <if test="regionId != null"> 
-            and r.REGION_ID = #{regionId} 
+          <if test="v.regionId != null"> 
+            and r.REGION_ID = #{v.regionId} 
           </if>
       ) a 
       left outer join v_cd cd1 

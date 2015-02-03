@@ -35,8 +35,8 @@
   </sql>
   
   <!-- 施設情報取得 -->
-  <select id="selectFacility" resultMap="facilityDtoResultMap"
-    parameterType="com.melip.webservices.service.facility.FacilitySearchCondition" useCache="false">
+  <select id="selectFacility" resultMap="facilityDtoResultMap" parameterType="CONDITION"
+    useCache="false">
 
     select
         a.FACILITY_ID          as facilityId
@@ -76,8 +76,8 @@
           inner join m_facility_attr_grp fag 
             on fav.FACILITY_ATTR_GRP_ID = fag.FACILITY_ATTR_GRP_ID 
             and fag.STS <include refid="stsCondition"/>  
-            <if test="facilityAttrGrpId != null"> 
-              and fag.FACILITY_ATTR_GRP_ID = #{facilityAttrGrpId}
+            <if test="v.facilityAttrGrpId != null"> 
+              and fag.FACILITY_ATTR_GRP_ID = #{v.facilityAttrGrpId}
             </if>
           inner join m_facility_attr_grp_lang fagl 
             on fag.FACILITY_ATTR_GRP_ID = fagl.FACILITY_ATTR_GRP_ID 
@@ -85,11 +85,11 @@
             and fagl.STS <include refid="stsCondition"/>  
         where
           f.STS <include refid="stsCondition"/>
-          <if test="regionId != null"> 
-            and f.REGION_ID = #{regionId}
+          <if test="v.regionId != null"> 
+            and f.REGION_ID = #{v.regionId}
           </if>
-          <if test="facilityId != null"> 
-            and f.FACILITY_ID = #{facilityId}
+          <if test="v.facilityId != null"> 
+            and f.FACILITY_ID = #{v.facilityId}
           </if>
       ) a 
       left outer join v_cd cd1 

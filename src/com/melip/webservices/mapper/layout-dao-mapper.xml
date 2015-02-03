@@ -56,8 +56,8 @@
   </sql>
   
   <!-- レイアウト・スクリーン情報取得 -->
-  <select id="selectLayoutScreen" resultMap="layoutScreenDtoResultMap"
-    parameterType="com.melip.webservices.service.layout.LayoutSearchCondition" useCache="false">
+  <select id="selectLayoutScreen" resultMap="layoutScreenDtoResultMap" parameterType="CONDITION"
+    useCache="false">
 
     select
         l.LAYOUT_ID            as layoutId
@@ -111,7 +111,7 @@
         and cd1.LANG_DIV <include refid="langDivCondition"/> 
     where
       s.STS <include refid="stsCondition"/> 
-      and s.SCREEN_ID = #{targetScreenId}
+      and s.SCREEN_ID = #{v.targetScreenId}
     order by
       s.SCREEN_ID
       , sog.SCREEN_OBJ_GRP_ID
