@@ -9,6 +9,11 @@
     <setting name="logImpl" value="LOG4J" />
   </settings>
 
+  <typeAliases>
+    <!-- QueryConditionのエイリアス -->
+    <typeAlias type="com.melip.webservices.service.common.QueryCondition" alias="CONDITION" />
+  </typeAliases>
+
   <environments default="dbConnect">
     <environment id="dbConnect">
       <transactionManager type="JDBC" />
@@ -22,7 +27,8 @@
   </environments>
 
   <mappers>
-    <!-- TODO:ワイルドカードで指定できないか？ -->
+    <!-- TODO:ワイルドカードで指定できないか？（以下packageの指定ではうまくいかない） -->
+    <!-- <package name="com.melip.webservices.mapper"/> -->
     <mapper resource="com/melip/webservices/mapper/region-dao-mapper.xml" />
     <mapper resource="com/melip/webservices/mapper/facility-dao-mapper.xml" />
     <mapper resource="com/melip/webservices/mapper/layout-dao-mapper.xml" />
