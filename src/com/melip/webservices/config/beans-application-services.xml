@@ -8,9 +8,13 @@
     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
+  <!-- システム初期化サービス -->
+  <bean id="systemInitializeService" class="com.melip.webservices.service.initialize.SystemInitializeService"
+    scope="prototype" lazy-init="true" />
+
   <!-- 基底データサービス -->
-  <bean id="abstractDataService" class="com.melip.webservices.service.AbstractDataService" scope="prototype"
-    lazy-init="true">
+  <bean id="abstractDataService" class="com.melip.webservices.service.AbstractDataService"
+    scope="prototype" lazy-init="true">
     <property name="dao" ref="dao" />
   </bean>
 
