@@ -17,6 +17,7 @@ import com.melip.webservices.dto.layout.LayoutScreenObjGrpDto;
 import com.melip.webservices.dto.layout.ScreenObjAttrDto;
 import com.melip.webservices.dto.region.RegionDto;
 import com.melip.webservices.service.common.AbstractDataService;
+import com.melip.webservices.service.common.QueryCondition;
 import com.melip.webservices.service.facility.IFacilityService;
 import com.melip.webservices.service.region.IRegionService;
 
@@ -56,9 +57,9 @@ public class LayoutService extends AbstractDataService implements ILayoutService
     setParameters(langDiv, targetScreenId, regionId, facilityId, facilityGrpId);
 
     // レイアウト・スクリーン情報取得
-    LayoutSearchCondition condition = new LayoutSearchCondition();
-    condition.setLangDiv(langDiv);
-    condition.setTargetScreenId(targetScreenId);
+    QueryCondition condition = new QueryCondition(langDiv);
+    // TODO:ベタ書き
+    condition.setValue("targetScreenId", targetScreenId);
     LayoutScreenDto layoutScreenDto = selectOne(getSelectLayoutScreenSqlId(), condition);
 
     return createScreenDto(layoutScreenDto);

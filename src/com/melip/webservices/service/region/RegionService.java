@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.melip.webservices.dto.region.RegionDto;
 import com.melip.webservices.service.common.AbstractDataService;
+import com.melip.webservices.service.common.QueryCondition;
 
 /**
  * 地域のサービスクラスです。
@@ -28,10 +29,11 @@ public class RegionService extends AbstractDataService implements IRegionService
   @Override
   public List<RegionDto> getRegionList(String langDiv, Integer regionAttrGrpId) {
 
-    RegionSearchCondition condition = new RegionSearchCondition();
-    condition.setLangDiv(langDiv);
-    condition.setRegionAttrGrpId(regionAttrGrpId);
+    QueryCondition condition = new QueryCondition(langDiv);
+    // TODO:ベタ書き
+    condition.setValue("regionAttrGrpId", regionAttrGrpId);
     List<RegionDto> regionDtoList = selectList(getSelectRegionSqlId(), condition);
+
     return regionDtoList;
   }
 
@@ -51,11 +53,12 @@ public class RegionService extends AbstractDataService implements IRegionService
   @Override
   public RegionDto getRegion(String langDiv, Integer regionId, Integer regionAttrGrpId) {
 
-    RegionSearchCondition condition = new RegionSearchCondition();
-    condition.setLangDiv(langDiv);
-    condition.setRegionId(regionId);
-    condition.setRegionAttrGrpId(regionAttrGrpId);
+    QueryCondition condition = new QueryCondition(langDiv);
+    // TODO:ベタ書き
+    condition.setValue("regionId", regionId);
+    condition.setValue("regionAttrGrpId", regionAttrGrpId);
     RegionDto regionDto = selectOne(getSelectRegionSqlId(), condition);
+
     return regionDto;
   }
 

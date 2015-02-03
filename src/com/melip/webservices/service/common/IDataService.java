@@ -24,8 +24,7 @@ public interface IDataService {
    * @param condition 検索条件
    * @return 検索結果
    */
-  public <To extends AbstractDto, Ti extends SearchCondition> To selectOne(String sqlId,
-      Ti condition);
+  public <T extends AbstractDto> T selectOne(String sqlId, QueryCondition condition);
 
   /**
    * データを複数件取得します。
@@ -42,6 +41,5 @@ public interface IDataService {
    * @param condition 検索条件
    * @return 検索結果
    */
-  public <E extends AbstractDto, T extends SearchCondition> List<E> selectList(String sqlId,
-      T condition);
+  public <E extends AbstractDto> List<E> selectList(String sqlId, QueryCondition condition);
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.melip.webservices.dto.facility.FacilityDto;
 import com.melip.webservices.service.common.AbstractDataService;
+import com.melip.webservices.service.common.QueryCondition;
 
 /**
  * 施設のサービスクラスです。
@@ -47,11 +48,12 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
   public List<FacilityDto> getFacilityListByRegion(String langDiv, Integer regionId,
       Integer facilityAttrGrpId) {
 
-    FacilitySearchCondition condition = new FacilitySearchCondition();
-    condition.setLangDiv(langDiv);
-    condition.setRegionId(regionId);
-    condition.setFacilityAttrGrpId(facilityAttrGrpId);
+    QueryCondition condition = new QueryCondition(langDiv);
+    // TODO:ベタ書き
+    condition.setValue("regionId", regionId);
+    condition.setValue("facilityAttrGrpId", facilityAttrGrpId);
     List<FacilityDto> facilityDtoList = selectList(getSelectFacilitySqlId(), condition);
+
     return facilityDtoList;
   }
 
@@ -71,11 +73,12 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
   @Override
   public FacilityDto getFacility(String langDiv, Integer facilityId, Integer facilityAttrGrpId) {
 
-    FacilitySearchCondition condition = new FacilitySearchCondition();
-    condition.setLangDiv(langDiv);
-    condition.setFacilityId(facilityId);
-    condition.setFacilityAttrGrpId(facilityAttrGrpId);
+    QueryCondition condition = new QueryCondition(langDiv);
+    // TODO:ベタ書き
+    condition.setValue("facilityId", facilityId);
+    condition.setValue("facilityAttrGrpId", facilityAttrGrpId);
     FacilityDto facilityDto = selectOne(getSelectFacilitySqlId(), condition);
+
     return facilityDto;
   }
 

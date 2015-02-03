@@ -17,11 +17,17 @@
     </param-value>
   </context-param>
 
+  <!-- Log4J -->
   <listener>
     <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
   </listener>
+  <!-- Spring -->
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <!-- 初期化処理 -->
+  <listener>
+    <listener-class>com.melip.webservices.service.initialize.InitializeServletContextListener</listener-class>
   </listener>
 
   <welcome-file-list>

@@ -23,30 +23,17 @@ public abstract class AbstractDataService extends AbstractService implements IDa
    */
   @Override
   public <T extends AbstractDto> T selectOne(String sqlId) {
-
-    T result = null;
-    try {
-      result = getSession().selectOne(sqlId);
-    } catch (PersistenceException e) {
-      // TODO:例外処理
-      e.printStackTrace();
-    } catch (Exception e) {
-      // TODO:例外処理
-      e.printStackTrace();
-    }
-
-    return result;
+    return selectOne(sqlId, null);
   }
 
   /**
    * @see com.melip.webservices.service.common.IDataService#selectOne(java.lang.String,
-   *      com.melip.webservices.service.common.SearchCondition)
+   *      com.melip.webservices.service.common.QueryCondition)
    */
   @Override
-  public <To extends AbstractDto, Ti extends SearchCondition> To selectOne(String sqlId,
-      Ti condition) {
+  public <T extends AbstractDto> T selectOne(String sqlId, QueryCondition condition) {
 
-    To result = null;
+    T result = null;
     try {
       result = getSession().selectOne(sqlId, condition);
     } catch (PersistenceException e) {
@@ -65,28 +52,15 @@ public abstract class AbstractDataService extends AbstractService implements IDa
    */
   @Override
   public <E extends AbstractDto> List<E> selectList(String sqlId) {
-
-    List<E> resultList = new ArrayList<E>();
-    try {
-      resultList = getSession().selectList(sqlId);
-    } catch (PersistenceException e) {
-      // TODO:例外処理
-      e.printStackTrace();
-    } catch (Exception e) {
-      // TODO:例外処理
-      e.printStackTrace();
-    }
-
-    return resultList;
+    return selectList(sqlId, null);
   }
 
   /**
    * @see com.melip.webservices.service.common.IDataService#selectList(java.lang.String,
-   *      com.melip.webservices.service.common.SearchCondition)
+   *      com.melip.webservices.service.common.QueryCondition)
    */
   @Override
-  public <E extends AbstractDto, T extends SearchCondition> List<E> selectList(String sqlId,
-      T condition) {
+  public <E extends AbstractDto> List<E> selectList(String sqlId, QueryCondition condition) {
 
     List<E> resultList = new ArrayList<E>();
     try {
