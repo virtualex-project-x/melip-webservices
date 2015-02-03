@@ -6,6 +6,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.melip.common.dto.screen.ScreenDto;
 import com.melip.webservices.common.BeanCreator;
@@ -17,6 +19,8 @@ import com.melip.webservices.service.layout.ILayoutService;
  */
 @Path("/screenDto")
 public class ScreenDtoResource extends AbstractResource {
+
+  private static final Logger log = LoggerFactory.getLogger(ScreenDtoResource.class);
 
   /** 言語区分 */
   private String langDiv;
@@ -69,6 +73,15 @@ public class ScreenDtoResource extends AbstractResource {
       String facilityId, String facilityGrpId) {
 
     // TODO:必須チェックなど
+
+    if (log.isDebugEnabled()) {
+      log.debug("【パラメータ情報】");
+      log.debug("  言語区分         -> " + langDiv);
+      log.debug("  対象スクリーンID -> " + targetScreenId);
+      log.debug("  地域ID           -> " + regionId);
+      log.debug("  施設ID           -> " + facilityId);
+      log.debug("  施設グループID   -> " + facilityGrpId);
+    }
 
     // 言語区分
     setLangDiv(langDiv);

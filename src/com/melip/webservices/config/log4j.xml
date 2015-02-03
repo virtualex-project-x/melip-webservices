@@ -34,6 +34,12 @@
     <appender-ref ref="stdout" />
   </logger>
 
+  <!-- Resourceの設定 -->
+  <logger name="com.melip.webservices.resource" additivity="false">
+    <level value="debug" />
+    <appender-ref ref="stdout" />
+  </logger>
+
   <!-- デフォルト -->
   <root>
     <level value="info" />
