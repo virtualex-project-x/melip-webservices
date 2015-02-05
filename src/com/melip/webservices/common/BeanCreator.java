@@ -1,7 +1,10 @@
 package com.melip.webservices.common;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Bean生成用のクラスです。
@@ -10,8 +13,6 @@ public class BeanCreator {
 
   /** アプリケーションコンテキスト */
   private static ApplicationContext _applicationContext;
-  /** コンテキストパス */
-  private static final String CONTEXT_PATH = "com/melip/webservices/config/applicationContext.xml";
 
   /**
    * プライベートコンストラクタ<br>
@@ -19,15 +20,22 @@ public class BeanCreator {
    */
   private BeanCreator() {}
 
-  static {
-    init();
+  /**
+   * ServletContextに設定されているApplicationContextでBeanCreatorを初期化します。
+   */
+  public static void init(ServletContext servletContext) {
+
+    _applicationContext =
+        WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
   }
 
   /**
-   * 初期化処理を実施します。
+   * クラスパスのApplicationContextでBeanCreatorを初期化します。
+   * 
+   * @param applicationContextClassPath ApplicationContextのクラスパス
    */
-  private static void init() {
-    _applicationContext = new ClassPathXmlApplicationContext(new String[] {CONTEXT_PATH});
+  public static void init(String applicationContextClassPath) {
+    _applicationContext = new ClassPathXmlApplicationContext(applicationContextClassPath);
   }
 
   /**
@@ -40,7 +48,7 @@ public class BeanCreator {
   public static <T> T getBean(String beanId, Class<T> clazz) {
 
     if (_applicationContext == null) {
-      init();
+      throw new IllegalStateException("BeanCreatorが初期化されていないため、ApplicationContextを取得できません。");
     }
 
     return (T) _applicationContext.getBean(beanId, clazz);
