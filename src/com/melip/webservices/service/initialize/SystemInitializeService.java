@@ -3,16 +3,12 @@ package com.melip.webservices.service.initialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.melip.webservices.service.common.ServiceRuntimeException;
 import com.melip.webservices.system.MessageProvider;
 
 /**
  * システムの初期化処理を実行するクラスです。
  */
 public class SystemInitializeService implements ISystemInitializeService {
-
-  /** メッセージ初期化エラーメッセージ */
-  private static final String MSG_INIT_MESSAGE_ERROR = "IS-0001";
 
   private static final Logger log = LoggerFactory.getLogger(SystemInitializeService.class);
 
@@ -36,7 +32,7 @@ public class SystemInitializeService implements ISystemInitializeService {
     try {
       MessageProvider.registerProperty();
     } catch (Exception e) {
-      throw new ServiceRuntimeException(MSG_INIT_MESSAGE_ERROR, e);
+      throw new RuntimeException("メッセージの初期化処理でエラーが発生しました。", e);
     }
 
     log.info("メッセージの初期化処理が終了しました。");
