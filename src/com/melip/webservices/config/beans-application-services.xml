@@ -13,17 +13,12 @@
     scope="prototype" lazy-init="true" />
 
   <!-- 基底データサービス -->
-  <bean id="abstractDataService" class="com.melip.webservices.service.AbstractDataService"
+  <bean id="abstractDataService" class="com.melip.webservices.service.common.AbstractDataService"
     scope="prototype" lazy-init="true">
     <property name="dao" ref="dao" />
   </bean>
 
   <!-- #################### 通常サービス #################### -->
-
-  <!-- テストサービス -->
-  <bean id="testService" class="com.melip.webservices.service.TestService" scope="prototype"
-    lazy-init="true" parent="abstractDataService">
-  </bean>
 
   <!-- 地域サービス -->
   <bean id="regionService" class="com.melip.webservices.service.region.RegionService" scope="prototype"
