@@ -11,9 +11,6 @@ public class ServiceException extends MelipException {
   /** デフォルトのメッセージキー */
   public static final String DEFAULT_MESSAGE_KEY = MessageConstants.SVC_0001;
 
-  // シリアルバージョンUID
-  private static final long serialVersionUID = 1L;
-
   /**
    * コンストラクタ
    */

@@ -5,12 +5,12 @@
 <mapper namespace="com.melip.webservices.mapper.Facility">
 
   <!-- 施設DTO用resultMap -->
-  <resultMap id="facilityDtoResultMap" type="com.melip.webservices.dto.facility.FacilityDto">
+  <resultMap id="facilityDtoResultMap" type="com.melip.webservices.dto.FacilityDto">
     <id property="facilityId" column="facilityId" />
+    <result property="latitude" column="latitude" />
+    <result property="longitude" column="longitude" />
     <collection property="attrDtoList" ofType="com.melip.common.dto.common.AttrDto">
       <id property="attrGrpId" column="attrGrpId" />
-      <result property="regionId" column="regionId" />
-      <result property="facilityId" column="facilityId" />
       <result property="attrGrpType" column="attrGrpType" />
       <result property="attrGrpNm" column="attrGrpNm" />
       <result property="attrVal" column="attrVal" />
@@ -40,65 +40,105 @@
 
     select
         a.FACILITY_ID          as facilityId
+      , a.LATITUDE             as latitude
+      , a.LONGITUDE            as longitude
       , a.FACILITY_ATTR_GRP_ID as attrGrpId
-      , a.REGION_ID            as regionId
       , a.TYPE                 as attrGrpType
       , a.NM                   as attrGrpNm
       , case 
-        when cd1.CD_NM is null 
+        when cd.CD_NM is null 
         then a.val 
-        else cd1.CD_NM 
+        else cd.CD_NM 
         end                    as attrVal
       , case 
-        when cd1.cd_nm is null 
+        when cd.cd_nm is null 
         then null 
         else a.VAL 
         end                    as attrCdVal 
     from
       ( 
         select
-            f.FACILITY_ID
-          , f.REGION_ID
+            f1.FACILITY_ID
+          , f1.LATITUDE
+          , f1.LONGITUDE
           , fag.FACILITY_ATTR_GRP_ID
-          , fagl.NM
-          , favl.VAL
+          , fag.ALIAS
           , fag.TYPE
-          , fag.CD_GRP_ID 
+          , fag.CD_GRP_ID
+          , fagl.NM
+          , favl.VAL 
         from
-          m_facility f 
+          m_facility f1 
           inner join m_facility_attr_val fav 
-            on f.FACILITY_ID = fav.FACILITY_ID 
+            on f1.FACILITY_ID = fav.FACILITY_ID 
             and fav.STS <include refid="stsCondition"/>
           inner join m_facility_attr_val_lang favl 
             on fav.FACILITY_ATTR_VAL_ID = favl.FACILITY_ATTR_VAL_ID 
-            and favl.LANG_DIV <include refid="langDivCondition"/> 
-            and favl.STS <include refid="stsCondition"/>  
+            and favl.STS <include refid="stsCondition"/>
+            and favl.LANG_DIV <include refid="langDivCondition"/>
           inner join m_facility_attr_grp fag 
             on fav.FACILITY_ATTR_GRP_ID = fag.FACILITY_ATTR_GRP_ID 
-            and fag.STS <include refid="stsCondition"/>  
-            <if test="v.facilityAttrGrpId != null"> 
-              and fag.FACILITY_ATTR_GRP_ID = #{v.facilityAttrGrpId}
-            </if>
+            and fag.STS <include refid="stsCondition"/>
           inner join m_facility_attr_grp_lang fagl 
             on fag.FACILITY_ATTR_GRP_ID = fagl.FACILITY_ATTR_GRP_ID 
-            and fagl.LANG_DIV <include refid="langDivCondition"/> 
-            and fagl.STS <include refid="stsCondition"/>  
+            and fagl.STS <include refid="stsCondition"/>
+            and fagl.LANG_DIV <include refid="langDivCondition"/>
         where
-          f.STS <include refid="stsCondition"/>
-          <if test="v.regionId != null"> 
-            and f.REGION_ID = #{v.regionId}
-          </if>
+          f1.STS <include refid="stsCondition"/>
+          <if test="p.regionId != null"> 
+            and f1.REGION_ID = #{p.regionId}
+          </if> 
           <if test="v.facilityId != null"> 
-            and f.FACILITY_ID = #{v.facilityId}
+            and f1.FACILITY_ID = #{v.facilityId}
+          </if> 
+          <if test="p.attrGrpSearchConditionDtoList != null">
+            and exists ( 
+              select
+                  * 
+              from
+                m_facility f2 
+                inner join m_facility_attr_val fav 
+                  on f2.FACILITY_ID = fav.FACILITY_ID 
+                  and fav.STS <include refid="stsCondition"/>
+                inner join m_facility_attr_val_lang favl 
+                  on fav.FACILITY_ATTR_VAL_ID = favl.FACILITY_ATTR_VAL_ID 
+                  and favl.STS <include refid="stsCondition"/>
+                  and favl.LANG_DIV <include refid="langDivCondition"/>
+                inner join m_facility_attr_grp fag 
+                  on fav.FACILITY_ATTR_GRP_ID = fag.FACILITY_ATTR_GRP_ID 
+                  and fag.STS <include refid="stsCondition"/>
+              where
+                f1.FACILITY_ID = f2.FACILITY_ID 
+                and ( 
+                  <trim prefixOverrides="or ">
+                    <foreach collection="p.attrGrpSearchConditionDtoList" item="item">
+                      or (fag.ALIAS = #{item.attrGrpAlias} and favl.VAL = #{item.val})
+                    </foreach>
+                  </trim>
+                ) 
+              group by
+                f2.FACILITY_ID
+              <if test="p.numOfSearchCondition != null and p.numOfSearchCondition != 0"> 
+                having
+                  count(*) = #{p.numOfSearchCondition}
+              </if>
+            )
           </if>
       ) a 
-      left outer join v_cd cd1 
-        on a.CD_GRP_ID = cd1.CD_GRP_ID 
-        and a.VAL = cd1.CD 
-        and cd1.LANG_DIV <include refid="langDivCondition"/> 
+      left outer join v_cd cd 
+        on a.CD_GRP_ID = cd.CD_GRP_ID 
+        and a.VAL = cd.CD 
+        and cd.LANG_DIV <include refid="langDivCondition"/>
+    <where>
+      <if test="p.targetAttrGrpAliasList != null">
+        <foreach collection="p.targetAttrGrpAliasList" item="item" >
+          or a.ALIAS = #{item}
+        </foreach>
+      </if>
+    </where> 
     order by
-      a.FACILITY_ID
-      , a.FACILITY_ATTR_GRP_ID
+      facilityId
+      , attrGrpId
 
   </select>
 

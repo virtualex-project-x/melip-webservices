@@ -11,9 +11,6 @@ public class ServiceRuntimeException extends MelipRuntimeException {
   /** デフォルトのメッセージキー */
   public static final String DEFAULT_MESSAGE_KEY = MessageConstants.SVC_0002;
 
-  // シリアルバージョンUID
-  private static final long serialVersionUID = 1L;
-
   /**
    * コンストラクタ
    */

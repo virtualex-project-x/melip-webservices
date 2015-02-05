@@ -2,6 +2,7 @@ package com.melip.webservices.service.common;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.melip.common.constants.CodeConstants;
@@ -13,6 +14,8 @@ public class QueryCondition implements IQueryCondition {
 
   /** パラメータのキー */
   private static final String KEY_PARAM = "p";
+  /** デフォルトの件数 */
+  private static final Integer DEFAULT_COUNT = 999999;
 
   /** 検索条件マップ */
   private Map<Object, Object> value = new HashMap<Object, Object>();
@@ -20,6 +23,12 @@ public class QueryCondition implements IQueryCondition {
   private String[] stsArray = {CodeConstants.CODE_STS_VALID};
   /** 言語区分配列 */
   private String[] langDivArray;
+  /** 開始位置 */
+  private Integer index = 1;
+  /** 取得件数 */
+  private Integer count = DEFAULT_COUNT;
+  /** ソートキー */
+  private Map<String, Boolean> orderBy = new LinkedHashMap<String, Boolean>();
 
   /**
    * コンストラクタ
@@ -156,6 +165,71 @@ public class QueryCondition implements IQueryCondition {
    */
   public void setLangDiv(String langDiv) {
     setLangDivArray(new String[] {langDiv, CodeConstants.CODE_LANG_DIV_COMMON});
+  }
+
+  /**
+   * 開始位置を取得します。
+   * 
+   * @return 開始位置
+   */
+  public Integer getIndex() {
+    return index;
+  }
+
+  /**
+   * 開始位置を設定します。
+   * 
+   * @param index 開始位置
+   */
+  public void setIndex(Integer index) {
+    this.index = index;
+  }
+
+  /**
+   * 取得件数を取得します。
+   * 
+   * @return 取得件数
+   */
+  public Integer getCount() {
+    return count;
+  }
+
+  /**
+   * 取得件数を設定します。
+   * 
+   * @param count 取得件数
+   */
+  public void setCount(Integer count) {
+    this.count = count;
+  }
+
+  /**
+   * ソートキーを取得します。
+   * 
+   * @return ソートキー
+   */
+  public Map<String, Boolean> getOrderBy() {
+    return orderBy;
+  }
+
+  /**
+   * ソートキーを追加します。
+   * 
+   * @param attr 対象の属性
+   * @param isAsc 昇順の場合true、降順の場合false
+   */
+  public void addOrderBy(String attr, boolean isAsc) {
+    getOrderBy().put(attr, isAsc);
+  }
+
+  /**
+   * ソートキーを追加します。<br>
+   * 順序は昇順です。
+   * 
+   * @param attr 対象の属性
+   */
+  public void addOrderBy(String attr) {
+    addOrderBy(attr, true);
   }
 
 }

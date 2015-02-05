@@ -1,8 +1,11 @@
 package com.melip.webservices.service.facility;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import com.melip.webservices.dto.facility.FacilityDto;
+import com.melip.webservices.common.DtoList;
+import com.melip.webservices.dto.FacilityDto;
 import com.melip.webservices.service.common.AbstractDataService;
 import com.melip.webservices.service.common.QueryCondition;
 
@@ -15,71 +18,120 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
   private String selectFacilitySqlId;
 
   /**
-   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityList(java.lang.String)
+   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityDtoList(java.lang.String)
    */
   @Override
-  public List<FacilityDto> getFacilityList(String langDiv) {
-    return getFacilityListByRegion(langDiv, null, null);
+  public DtoList<FacilityDto> getFacilityDtoList(String langDiv) {
+    return getFacilityDtoList(new QueryCondition(langDiv));
   }
 
   /**
-   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityList(java.lang.String,
-   *      java.lang.Integer)
-   */
-  @Override
-  public List<FacilityDto> getFacilityList(String langDiv, Integer facilityAttrGrpId) {
-    return getFacilityListByRegion(langDiv, null, facilityAttrGrpId);
-  }
-
-  /**
-   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityListByRegion(java.lang.String,
-   *      java.lang.Integer)
-   */
-  @Override
-  public List<FacilityDto> getFacilityListByRegion(String langDiv, Integer regionId) {
-    return getFacilityListByRegion(langDiv, regionId, null);
-  }
-
-  /**
-   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityListByRegion(java.lang.String,
+   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityDtoList(java.lang.String,
    *      java.lang.Integer, java.lang.Integer)
    */
   @Override
-  public List<FacilityDto> getFacilityListByRegion(String langDiv, Integer regionId,
-      Integer facilityAttrGrpId) {
+  public DtoList<FacilityDto> getFacilityDtoList(String langDiv, Integer index, Integer count) {
 
     QueryCondition condition = new QueryCondition(langDiv);
-    // TODO:ベタ書き
-    condition.setValue("regionId", regionId);
-    condition.setValue("facilityAttrGrpId", facilityAttrGrpId);
-    List<FacilityDto> facilityDtoList = selectList(getSelectFacilitySqlId(), condition);
+    condition.setIndex(index);
+    condition.setCount(count);
+    return getFacilityDtoList(condition);
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityDtoList(com.melip.webservices.service.common.QueryCondition)
+   */
+  @Override
+  public DtoList<FacilityDto> getFacilityDtoList(QueryCondition condition) {
+
+    List<FacilityDto> facilityList = selectList(getSelectFacilitySqlId(), condition);
+    Integer allCount = facilityList.size();
+
+    // ソート
+    sortFacilityList(facilityList, condition);
+    // 指定件数を切り出す
+    List<FacilityDto> cutFacilityList = cutFacilityList(facilityList, condition);
+
+    DtoList<FacilityDto> facilityDtoList = new DtoList<FacilityDto>(cutFacilityList);
+    facilityDtoList.setAllCount(allCount);
+    facilityDtoList.setIndex(condition.getIndex());
+    facilityDtoList.setCount(condition.getCount());
+    facilityDtoList.setCondition(condition);
 
     return facilityDtoList;
   }
 
   /**
-   * @see com.melip.webservices.service.facility.IFacilityService#getFacility(java.lang.String,
-   *      java.lang.Integer)
+   * 施設DTOリストを検索条件のソートキーにもとづいてソートします。
+   * 
+   * @param facilityList 施設DTOリスト
+   * @param condition 検索条件
    */
-  @Override
-  public FacilityDto getFacility(String langDiv, Integer facilityId) {
-    return getFacility(langDiv, facilityId, null);
+  private void sortFacilityList(List<FacilityDto> facilityList, QueryCondition condition) {
+
+    Collections.sort(facilityList, (FacilityDto1, FacilityDto2) -> {
+
+      // TODO:実装
+      // [参考]http://www.ne.jp/asahi/hishidama/home/tech/java/comparator.html#thenComparing
+
+
+
+        return 0;
+
+      }
+
+    );
   }
 
   /**
-   * @see com.melip.webservices.service.facility.IFacilityService#getFacility(java.lang.String,
-   *      java.lang.Integer, java.lang.Integer)
+   * 施設DTOリストを検索条件の開始位置、取得件数にもとづいて切り出します。
+   * 
+   * @param facilityList 施設DTOリスト
+   * @param condition 検索条件
+   * @return 切り出した施設DTOリスト
+   */
+  private List<FacilityDto> cutFacilityList(List<FacilityDto> facilityList, QueryCondition condition) {
+
+    int index = condition.getIndex();
+    int count = condition.getCount();
+
+    if (index > facilityList.size()) {
+      // TODO:
+      // facilityListの件数よりも大きいインデックスを指定された場合エラーとするか
+      // nullを返してリストが空となるかどちらがよいか？
+      return null;
+    }
+
+    List<FacilityDto> cutFacilityList = new ArrayList<FacilityDto>();
+    for (int i = index; i < index + count; i++) {
+      cutFacilityList.add(facilityList.get(i - 1));
+      // リストの末尾に達した場合は終了
+      if (i == facilityList.size()) {
+        break;
+      }
+    }
+
+    return cutFacilityList;
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityDto(java.lang.String,
+   *      java.lang.Integer)
    */
   @Override
-  public FacilityDto getFacility(String langDiv, Integer facilityId, Integer facilityAttrGrpId) {
-
-    QueryCondition condition = new QueryCondition(langDiv);
+  public FacilityDto getFacilityDto(String langDiv, Integer facilityId) {
     // TODO:ベタ書き
+    QueryCondition condition = new QueryCondition(langDiv);
     condition.setValue("facilityId", facilityId);
-    condition.setValue("facilityAttrGrpId", facilityAttrGrpId);
-    FacilityDto facilityDto = selectOne(getSelectFacilitySqlId(), condition);
+    return getFacilityDto(condition);
+  }
 
-    return facilityDto;
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#getFacilityDto(com.melip.webservices.service.common.QueryCondition)
+   */
+  @Override
+  public FacilityDto getFacilityDto(QueryCondition condition) {
+    return selectOne(getSelectFacilitySqlId(), condition);
   }
 
   /**

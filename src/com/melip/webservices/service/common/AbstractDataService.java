@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.SqlSession;
 
-import com.melip.common.dto.common.AbstractDto;
+import com.melip.common.dto.common.IDto;
 import com.melip.webservices.common.IDao;
 
 /**
@@ -22,7 +22,7 @@ public abstract class AbstractDataService extends AbstractService implements IDa
    * @see com.melip.webservices.service.common.IDataService#selectOne(java.lang.String)
    */
   @Override
-  public <T extends AbstractDto> T selectOne(String sqlId) {
+  public <T extends IDto> T selectOne(String sqlId) {
     return selectOne(sqlId, null);
   }
 
@@ -31,7 +31,7 @@ public abstract class AbstractDataService extends AbstractService implements IDa
    *      com.melip.webservices.service.common.QueryCondition)
    */
   @Override
-  public <T extends AbstractDto> T selectOne(String sqlId, QueryCondition condition) {
+  public <T extends IDto> T selectOne(String sqlId, QueryCondition condition) {
 
     T result = null;
     try {
@@ -51,7 +51,7 @@ public abstract class AbstractDataService extends AbstractService implements IDa
    * @see com.melip.webservices.service.common.IDataService#selectList(java.lang.String)
    */
   @Override
-  public <E extends AbstractDto> List<E> selectList(String sqlId) {
+  public <E extends IDto> List<E> selectList(String sqlId) {
     return selectList(sqlId, null);
   }
 
@@ -60,7 +60,7 @@ public abstract class AbstractDataService extends AbstractService implements IDa
    *      com.melip.webservices.service.common.QueryCondition)
    */
   @Override
-  public <E extends AbstractDto> List<E> selectList(String sqlId, QueryCondition condition) {
+  public <E extends IDto> List<E> selectList(String sqlId, QueryCondition condition) {
 
     List<E> resultList = new ArrayList<E>();
     try {

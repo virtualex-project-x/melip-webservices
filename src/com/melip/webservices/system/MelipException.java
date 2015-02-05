@@ -12,9 +12,6 @@ public class MelipException extends Exception {
   /** 空のメッセージパラメータ */
   public static final Object[] BLANK_PARAMS = new Object[] {};
 
-  // シリアルバージョンUID
-  private static final long serialVersionUID = 1L;
-
   /** メッセージキー */
   private String messageKey;
   /** メッセージパラメータ */

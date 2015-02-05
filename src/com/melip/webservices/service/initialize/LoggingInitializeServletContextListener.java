@@ -51,7 +51,7 @@ public class LoggingInitializeServletContextListener implements ServletContextLi
         log.warn("Log4Jの設定ファイルが指定されていないため、デフォルト設定を使用します。");
       }
 
-      log.info("Log4Jの初期化処理が終了しました。");
+      log.info("Log4Jの初期化処理が終了しました。[" + logConfigFilePath + "]");
     } catch (Exception e) {
       log.error("Log4Jの初期化に失敗しました。", e);
     }

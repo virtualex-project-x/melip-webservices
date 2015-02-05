@@ -20,24 +20,10 @@
 
   <!-- #################### 通常サービス #################### -->
 
-  <!-- 地域サービス -->
-  <bean id="regionService" class="com.melip.webservices.service.region.RegionService" scope="prototype"
-    lazy-init="true" parent="abstractDataService">
-    <property name="selectRegionSqlId" value="com.melip.webservices.mapper.Region.selectRegion" />
-  </bean>
-
   <!-- 施設サービス -->
   <bean id="facilityService" class="com.melip.webservices.service.facility.FacilityService"
     scope="prototype" lazy-init="true" parent="abstractDataService">
     <property name="selectFacilitySqlId" value="com.melip.webservices.mapper.Facility.selectFacility" />
-  </bean>
-
-  <!-- #################### レイアウトサービス #################### -->
-
-  <!-- レイアウトサービス -->
-  <bean id="layoutService" class="com.melip.webservices.service.layout.LayoutService" scope="prototype"
-    lazy-init="true" parent="abstractDataService">
-    <property name="selectLayoutScreenSqlId" value="com.melip.webservices.mapper.Layout.selectLayoutScreen" />
   </bean>
 
 </beans>

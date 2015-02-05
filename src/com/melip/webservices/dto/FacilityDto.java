@@ -1,4 +1,4 @@
-package com.melip.webservices.dto.facility;
+package com.melip.webservices.dto;
 
 import java.util.List;
 
@@ -12,16 +12,21 @@ public class FacilityDto extends AbstractDto {
 
   /** 施設IDのフィールド名 */
   public static final String FIELD_FACILITY_ID = "facilityId";
+  /** 緯度のフィールド名 */
+  public static final String FIELD_LATITUDE = "latitude";
+  /** 経度のフィールド名 */
+  public static final String FIELD_LONGITUDE = "longitude";
   /** 属性DTOリストのフィールド名 */
   public static final String FIELD_ATTR_DTO_LIST = "attrDtoList";
 
   /** 施設ID */
   private Integer facilityId;
+  /** 緯度 */
+  private Float latitude;
+  /** 経度 */
+  private Float longitude;
   /** 属性DTOリスト */
   private List<AttrDto> attrDtoList;
-
-  // シリアルバージョンUID
-  private static final long serialVersionUID = 1L;
 
   /**
    * 施設IDを取得します。
@@ -39,6 +44,42 @@ public class FacilityDto extends AbstractDto {
    */
   public void setFacilityId(Integer facilityId) {
     this.facilityId = facilityId;
+  }
+
+  /**
+   * 緯度を取得します。
+   * 
+   * @return 緯度
+   */
+  public Float getLatitude() {
+    return latitude;
+  }
+
+  /**
+   * 緯度を設定します。
+   * 
+   * @param latitude 緯度
+   */
+  public void setLatitude(Float latitude) {
+    this.latitude = latitude;
+  }
+
+  /**
+   * 経度を取得します。
+   * 
+   * @return 経度
+   */
+  public Float getLongitude() {
+    return longitude;
+  }
+
+  /**
+   * 経度を設定します。
+   * 
+   * @param longitude 経度
+   */
+  public void setLongitude(Float longitude) {
+    this.longitude = longitude;
   }
 
   /**

@@ -2,7 +2,7 @@
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
 <generatorConfiguration>
 
-  <properties resource="com/melip/webservices/config/config.properties" />
+  <properties resource="com/melip/webservices/config/melip-default.properties" />
 
   <context id="context1">
     <plugin type="com.melip.webservices.mybatis.generator.EntityClassNameChange"></plugin>

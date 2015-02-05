@@ -27,9 +27,7 @@
   <mappers>
     <!-- TODO:ワイルドカードで指定できないか？（以下packageの指定ではうまくいかない） -->
     <!-- <package name="com.melip.webservices.mapper"/> -->
-    <mapper resource="com/melip/webservices/mapper/region-dao-mapper.xml" />
     <mapper resource="com/melip/webservices/mapper/facility-dao-mapper.xml" />
-    <mapper resource="com/melip/webservices/mapper/layout-dao-mapper.xml" />
   </mappers>
 
 </configuration>
