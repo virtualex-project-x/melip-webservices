@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
+import com.melip.common.constants.CommonConstants;
 import com.melip.webservices.common.BeanCreator;
 
 /**
@@ -30,20 +31,16 @@ import com.melip.webservices.common.BeanCreator;
  */
 public class MessageProvider {
 
-  /** キーとメッセージのセパレータ */
-  public static final String SEPARATOR = " : ";
-  /** メッセージパラメータの開始カッコ */
-  public static final String BRACE_PARAM_START = "${";
-  /** メッセージパラメータの終了カッコ */
-  public static final String BRACE_PARAM_END = "}";
-
   /** DIコンテナ登録用の名称 */
   private static final String BEAN_ID = "messageProvider";
-  /** プロパティファイルの文字コード */
-  private static final String CHARSET_PROPERTY = "UTF-8";
-  /** デフォルトのプロパティファイルのクラスパス */
-  private static final String DEFAULT_CLASS_PATH_PROPERTY_FILE =
-      "classpath*:/**/message*.properties";
+  /** 読み込むメッセージプロパティファイルのパターン */
+  private static final String PATTERN_MESSAGE_PROPERTY_FILE = "classpath*:/**/message*.properties";
+  /** キーとメッセージのセパレータ */
+  private static final String SEPARATOR = " : ";
+  /** メッセージパラメータの開始カッコ */
+  private static final String BRACE_PARAM_START = "${";
+  /** メッセージパラメータの終了カッコ */
+  private static final String BRACE_PARAM_END = "}";
 
   private static final Logger log = LoggerFactory.getLogger(MessageProvider.class);
 
@@ -83,7 +80,7 @@ public class MessageProvider {
 
     List<String> pathlList = getMessageProvider().getPropertyFileClassPathList();
     if (CollectionUtils.isEmpty(pathlList)) {
-      Resource[] resources = resolver.getResources(DEFAULT_CLASS_PATH_PROPERTY_FILE);
+      Resource[] resources = resolver.getResources(PATTERN_MESSAGE_PROPERTY_FILE);
       resourceList = Arrays.asList(resources);
     } else {
       for (String path : pathlList) {
@@ -123,7 +120,8 @@ public class MessageProvider {
 
     File propertyFile = new File(propertyFileUrl.getPath());
     log.info("メッセージプロパティファイル[" + propertyFile.getName() + "]を読み込みます。");
-    registerProperty(new InputStreamReader(new FileInputStream(propertyFile), CHARSET_PROPERTY));
+    registerProperty(new InputStreamReader(new FileInputStream(propertyFile),
+        CommonConstants.SYSTEM_CHARSET));
   }
 
   /**

@@ -1,12 +1,14 @@
 package com.melip.webservices.system;
 
+import com.melip.webservices.constants.MessageConstants;
+
 /**
  * MELIP業務例外の基底クラスです。
  */
 public class MelipException extends Exception {
 
   /** デフォルトのメッセージキー */
-  public static final String DEFAULT_MESSAGE_KEY = "SYS-0001";
+  public static final String DEFAULT_MESSAGE_KEY = MessageConstants.SYS_0001;
   /** 空のメッセージパラメータ */
   public static final Object[] BLANK_PARAMS = new Object[] {};
 

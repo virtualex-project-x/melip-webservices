@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.melip.common.constants.CommonConstants;
 import com.melip.common.dto.screen.ScreenDto;
 import com.melip.webservices.common.BeanCreator;
 import com.melip.webservices.resource.common.AbstractResource;
@@ -44,7 +45,7 @@ public class ScreenDtoResource extends AbstractResource {
    * @return スクリーンDTO（JSON形式）
    */
   @GET
-  @Produces(MEDIA_TYPE_JSON)
+  @Produces(CommonConstants.MEDIA_TYPE_JSON)
   public ScreenDto getScreenDto(@QueryParam("langDiv") String langDiv,
       @QueryParam("targetScreenId") String targetScreenId, @QueryParam("regionId") String regionId,
       @QueryParam("facilityId") String facilityId, @QueryParam("facilityGrpId") String facilityGrpId) {

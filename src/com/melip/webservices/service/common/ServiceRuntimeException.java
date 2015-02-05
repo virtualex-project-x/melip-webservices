@@ -1,5 +1,6 @@
 package com.melip.webservices.service.common;
 
+import com.melip.webservices.constants.MessageConstants;
 import com.melip.webservices.system.MelipRuntimeException;
 
 /**
@@ -8,7 +9,7 @@ import com.melip.webservices.system.MelipRuntimeException;
 public class ServiceRuntimeException extends MelipRuntimeException {
 
   /** デフォルトのメッセージキー */
-  public static final String DEFAULT_MESSAGE_KEY = "SVC-0002";
+  public static final String DEFAULT_MESSAGE_KEY = MessageConstants.SVC_0002;
 
   // シリアルバージョンUID
   private static final long serialVersionUID = 1L;
