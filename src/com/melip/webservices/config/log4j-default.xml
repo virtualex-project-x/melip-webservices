@@ -5,6 +5,17 @@
 
   <!-- #################### appenderの設定 #################### -->
 
+  <!-- file appenderの設定 -->
+  <appender name="file" class="org.apache.log4j.DailyRollingFileAppender">
+    <param name="file" value="${melip.log.dir}/melip.log" />
+    <param name="append" value="true" />
+    <param name="datePattern" value="'.'yyyy-MM-dd" />
+    <!-- layoutの設定 -->
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %-5p (%F:%L) - %m%n" />
+    </layout>
+  </appender>
+
   <!-- stdout appenderの設定 -->
   <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
     <!-- layoutの設定 -->
@@ -20,30 +31,14 @@
     <!-- levelを「debug」にするとSQLと結果の件数、「trace」にするとさらに結果の内容まで出力されます。 -->
     <level value="debug" />
     <appender-ref ref="stdout" />
-  </logger>
-
-  <!-- MyBatis -->
-  <logger name="org.apache.ibatis" additivity="false">
-    <level value="debug" />
-    <appender-ref ref="stdout" />
-  </logger>
-
-  <!-- Jerseyの設定 -->
-  <logger name="javax.ws" additivity="false">
-    <level value="debug" />
-    <appender-ref ref="stdout" />
-  </logger>
-
-  <!-- Resourceの設定 -->
-  <logger name="com.melip.webservices.resource" additivity="false">
-    <level value="debug" />
-    <appender-ref ref="stdout" />
+    <appender-ref ref="file" />
   </logger>
 
   <!-- デフォルト -->
   <root>
     <level value="info" />
     <appender-ref ref="stdout" />
+    <appender-ref ref="file" />
   </root>
 
 </log4j:configuration>

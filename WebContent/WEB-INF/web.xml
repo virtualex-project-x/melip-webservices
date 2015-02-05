@@ -6,11 +6,6 @@
   <display-name>melip-webservices</display-name>
 
   <context-param>
-    <param-name>log4jConfigLocation</param-name>
-    <param-value>
-      classpath:com/melip/webservices/config/log4j.xml</param-value>
-  </context-param>
-  <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
       classpath:com/melip/webservices/config/applicationContext.xml
@@ -19,7 +14,7 @@
 
   <!-- Log4J -->
   <listener>
-    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    <listener-class>com.melip.webservices.service.initialize.LoggingInitializeServletContextListener</listener-class>
   </listener>
   <!-- Spring -->
   <listener>
