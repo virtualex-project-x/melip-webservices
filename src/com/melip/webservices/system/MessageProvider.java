@@ -6,19 +6,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.melip.webservices.common.BeanCreator;
 
 /**
- * アプリケーションで利用するメッセージを文字列を提供するクラスです。<br>
+ * アプリケーションで利用するメッセージ文字列を提供するクラスです。<br>
  * メッセージファイルは、プロパティファイル（.properties)として作成し、本クラスに設定します。<br>
  * Springによりシングルトンとして生成されます。
  */
@@ -35,17 +41,17 @@ public class MessageProvider {
   private static final String BEAN_ID = "messageProvider";
   /** プロパティファイルの文字コード */
   private static final String CHARSET_PROPERTY = "UTF-8";
+  /** デフォルトのプロパティファイルのクラスパス */
+  private static final String DEFAULT_CLASS_PATH_PROPERTY_FILE =
+      "classpath*:/**/message*.properties";
 
   private static final Logger log = LoggerFactory.getLogger(MessageProvider.class);
 
-  /** メッセージプロパティファイルのクラスパス */
-  private String propertyFileClassPath;
-  /** メッセージプロパティファイルのパス */
-  private String propertyFilePath;
+  /** メッセージプロパティファイルのクラスパスリスト */
+  private List<String> propertyFileClassPathList;
   /** プロパティのマップ */
   private Map<String, String> propertyMap;
 
-  // TODO:プライベートコンストラクタにも関わらずなぜSpringはインスタンス化できるのか？
   /**
    * コンストラクタ<br>
    * シングルトンのためプライベートとします。
@@ -63,26 +69,35 @@ public class MessageProvider {
 
   /**
    * メッセージプロパティファイルを設定します。<br>
-   * 本クラスのインスタンスに設定されたメッセージプロパティファイルのクラスパスを使用します。<br>
-   * クラスパスが設定されていない場合はパスを使用します。<br>
-   * どちらも設定されていない場合はエラーとします。
+   * クラスパスリストに指定されているプロパティファイルを読み込みます。<br>
+   * 指定されていない場合は、クラスパス上の「message*.properties」ファイルを読み込みます。
    * 
    * @throws IOException
    */
   public static void registerProperty() throws IOException {
 
-    MessageProvider provider = getMessageProvider();
-    String classPath = provider.getPropertyFileClassPath();
-    String path = provider.getPropertyFilePath();
+    ClassLoader loader = getMessageProvider().getClass().getClassLoader();
+    // Springのリソース取得クラスを利用
+    PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(loader);
+    List<Resource> resourceList = new ArrayList<Resource>();
 
-    if (StringUtils.isNotEmpty(classPath)) {
-      log.info("メッセージプロパティファイル[" + classPath + "]を読み込みます。");
-      registerPropertyByClassPath(classPath);
-    } else if (StringUtils.isNotEmpty(path)) {
-      log.info("メッセージプロパティファイル[" + path + "]を読み込みます。");
-      registerPropertyByPath(provider.getPropertyFilePath());
+    List<String> pathlList = getMessageProvider().getPropertyFileClassPathList();
+    if (CollectionUtils.isEmpty(pathlList)) {
+      Resource[] resources = resolver.getResources(DEFAULT_CLASS_PATH_PROPERTY_FILE);
+      resourceList = Arrays.asList(resources);
     } else {
-      throw new RuntimeException("メッセージプロパティファイルが設定されていません。");
+      for (String path : pathlList) {
+        Resource resource = resolver.getResource(path);
+        resourceList.add(resource);
+      }
+    }
+
+    if (CollectionUtils.isNotEmpty(resourceList)) {
+      for (Resource resource : resourceList) {
+        registerProperty(resource.getURL());
+      }
+    } else {
+      log.info("読み込むメッセージプロパティファイルはありません。");
     }
   }
 
@@ -92,26 +107,23 @@ public class MessageProvider {
    * @param propertyFileClassPath メッセージプロパティファイルのクラスパス
    * @throws IOException
    */
-  public static void registerPropertyByClassPath(String propertyFileClassPath) throws IOException {
+  public static void registerProperty(String propertyFileClassPath) throws IOException {
 
-    URL propertyFileUrl =
-        getMessageProvider().getClass().getClassLoader().getResource(propertyFileClassPath);
-    File propertyFile = new File(propertyFileUrl.getPath());
-    registerPropertyByReader(new InputStreamReader(new FileInputStream(propertyFile),
-        CHARSET_PROPERTY));
+    registerProperty(getMessageProvider().getClass().getClassLoader()
+        .getResource(propertyFileClassPath));
   }
 
   /**
    * メッセージプロパティファイルを設定します。
    * 
-   * @param propertyFilePath メッセージプロパティファイルのパス
+   * @param propertyFileUrl メッセージプロパティファイルのURL
    * @throws IOException
    */
-  public static void registerPropertyByPath(String propertyFilePath) throws IOException {
+  public static void registerProperty(URL propertyFileUrl) throws IOException {
 
-    File propertyFile = new File(propertyFilePath);
-    registerPropertyByReader(new InputStreamReader(new FileInputStream(propertyFile),
-        CHARSET_PROPERTY));
+    File propertyFile = new File(propertyFileUrl.getPath());
+    log.info("メッセージプロパティファイル[" + propertyFile.getName() + "]を読み込みます。");
+    registerProperty(new InputStreamReader(new FileInputStream(propertyFile), CHARSET_PROPERTY));
   }
 
   /**
@@ -120,7 +132,7 @@ public class MessageProvider {
    * @param reader メッセージプロパティファイルのリーダ
    * @throws IOException
    */
-  public static void registerPropertyByReader(Reader reader) throws IOException {
+  public static void registerProperty(Reader reader) throws IOException {
 
     Properties property = new Properties();
     property.load(reader);
@@ -255,39 +267,21 @@ public class MessageProvider {
   }
 
   /**
-   * メッセージプロパティファイルのクラスパスを取得します。
+   * メッセージプロパティファイルのクラスパスリストを取得します。
    * 
-   * @return メッセージプロパティファイルのクラスパス
+   * @return メッセージプロパティファイルのクラスパスリスト
    */
-  public String getPropertyFileClassPath() {
-    return propertyFileClassPath;
+  public List<String> getPropertyFileClassPathList() {
+    return propertyFileClassPathList;
   }
 
   /**
-   * メッセージプロパティファイルのクラスパスを設定します。
+   * メッセージプロパティファイルのクラスパスリストを設定します。
    * 
-   * @param propertyFileClassPath メッセージプロパティファイルのクラスパス
+   * @param propertyFileClassPathList メッセージプロパティファイルのクラスパスリスト
    */
-  public void setPropertyFileClassPath(String propertyFileClassPath) {
-    this.propertyFileClassPath = propertyFileClassPath;
-  }
-
-  /**
-   * メッセージプロパティファイルのパスを取得します。
-   * 
-   * @return メッセージプロパティファイルのパス
-   */
-  public String getPropertyFilePath() {
-    return propertyFilePath;
-  }
-
-  /**
-   * メッセージプロパティファイルのパスを設定します。
-   * 
-   * @param propertyFilePath メッセージプロパティファイルのパス
-   */
-  public void setPropertyFilePath(String propertyFilePath) {
-    this.propertyFilePath = propertyFilePath;
+  public void setPropertyFileClassPathList(List<String> propertyFileClassPathList) {
+    this.propertyFileClassPathList = propertyFileClassPathList;
   }
 
   /**

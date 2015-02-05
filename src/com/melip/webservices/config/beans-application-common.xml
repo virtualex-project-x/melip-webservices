@@ -9,9 +9,7 @@
     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
   <!-- メッセージ定義（シングルトン） -->
-  <bean id="messageProvider" class="com.melip.webservices.system.MessageProvider" scope="singleton">
-    <property name="propertyFileClassPath" value="com/melip/webservices/config/message.properties" />
-  </bean>
+  <bean id="messageProvider" class="com.melip.webservices.system.MessageProvider" scope="singleton" />
 
   <!-- DAO定義（シングルトン） -->
   <bean id="dao" class="com.melip.webservices.common.Dao" scope="singleton" init-method="init">
