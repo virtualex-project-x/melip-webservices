@@ -1,10 +1,14 @@
 package com.melip.webservices.service.initialize;
 
 import java.io.File;
+import java.net.URL;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.commons.lang.StringUtils;
@@ -12,19 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Log4jConfigurer;
 
+import com.melip.webservices.constants.MelipPropertiesConstants;
+
 /**
  * Log4Jの初期化を行うクラスです。
  */
 public class LoggingInitializeServletContextListener implements ServletContextListener {
 
-  /** システムプロパティのMELIP設定ファイルのキー */
-  private static final String SYSTEM_PROP_KEY_MELIP_PROPERTIES = "melip.props";
-  /** MELIP設定のLog4J設定ファイルのキー */
-  private static final String PROP_KEY_LOG4J_CONFIG = "melip.log.config";
-  /** MELIP設定のLog4Jログ出力ディレクトリのキー */
-  private static final String PROP_KEY_LOG4J_DIR = "melip.log.dir";
   /** デフォルトのLog4J設定 */
-  private static final String DEFAULT_LOG4J_CONFIG =
+  private static final String DEFAULT_LOG4J_CONFIG_FILE =
       "classpath:com/melip/webservices/config/log4j-default.xml";
 
   private static final Logger log = LoggerFactory
@@ -37,29 +37,17 @@ public class LoggingInitializeServletContextListener implements ServletContextLi
   public void contextInitialized(ServletContextEvent arg0) {
 
     try {
-      String logConfigFilePath = null;
+      // プロパティ設定を取得
+      Configuration config = getPropertiesConfiguration();
 
-      SystemConfiguration sysConfig = new SystemConfiguration();
-      String melipPropertiesPath = sysConfig.getString(SYSTEM_PROP_KEY_MELIP_PROPERTIES);
-      if (StringUtils.isEmpty(melipPropertiesPath) || !new File(melipPropertiesPath).exists()) {
-        logConfigFilePath = DEFAULT_LOG4J_CONFIG;
-      } else {
-        PropertiesConfiguration propConfig = new PropertiesConfiguration(melipPropertiesPath);
-        logConfigFilePath = propConfig.getString(PROP_KEY_LOG4J_CONFIG);
-        if (StringUtils.isEmpty(logConfigFilePath) || !new File(logConfigFilePath).exists()) {
-          logConfigFilePath = DEFAULT_LOG4J_CONFIG;
-        }
-
-        // ログ出力先ディレクトリをシステムプロパティに設定
-        String logDirPath = propConfig.getString(PROP_KEY_LOG4J_DIR);
-        if (StringUtils.isNotEmpty(logDirPath)) {
-          System.setProperty(PROP_KEY_LOG4J_DIR, logDirPath);
-        }
+      String logConfigFilePath = config.getString(MelipPropertiesConstants.PROP_KEY_LOG_CONF_FILE);
+      if (StringUtils.isEmpty(logConfigFilePath) || !new File(logConfigFilePath).exists()) {
+        logConfigFilePath = DEFAULT_LOG4J_CONFIG_FILE;
       }
 
       Log4jConfigurer.initLogging(logConfigFilePath);
 
-      if (DEFAULT_LOG4J_CONFIG.equals(logConfigFilePath)) {
+      if (DEFAULT_LOG4J_CONFIG_FILE.equals(logConfigFilePath)) {
         log.warn("Log4Jの設定ファイルが指定されていないため、デフォルト設定を使用します。");
       }
 
@@ -67,6 +55,45 @@ public class LoggingInitializeServletContextListener implements ServletContextLi
     } catch (Exception e) {
       log.error("Log4Jの初期化に失敗しました。", e);
     }
+  }
+
+  /**
+   * プロパティ設定を取得します。<br>
+   * システムプロパティ、拡張MELIP設定、デフォルトのMELIP設定をマージして返します。<br>
+   * また、ログ出力先ディレクトリをシステムプロパティに設定します。
+   * 
+   * @return プロパティ設定
+   * @throws ConfigurationException
+   */
+  private Configuration getPropertiesConfiguration() throws ConfigurationException {
+
+    CompositeConfiguration config = new CompositeConfiguration();
+
+    // システムプロパティ
+    config.addConfiguration(new SystemConfiguration());
+
+    // 拡張MELIP設定
+    // 同一キーはマージされないため、デフォルト設定より先に拡張設定を読み込む
+    String extProp = System.getProperty(MelipPropertiesConstants.SYS_PROP_KEY_MELIP_PROPERTIES);
+    if (StringUtils.isNotEmpty(extProp) && new File(extProp).exists()) {
+      config.addConfiguration(new PropertiesConfiguration(extProp));
+    }
+
+    // デフォルトのMELIP設定
+    URL defaultPropUrl =
+        this.getClass().getClassLoader()
+            .getResource(MelipPropertiesConstants.CLASS_PATH_DEFAULT_MELIP_PROPERTIES);
+    if (null != defaultPropUrl) {
+      config.addConfiguration(new PropertiesConfiguration(defaultPropUrl));
+    }
+
+    // ログ出力先ディレクトリをシステムプロパティに設定
+    String logDirPath = config.getString(MelipPropertiesConstants.PROP_KEY_MELIP_LOG_DIR);
+    if (StringUtils.isNotEmpty(logDirPath)) {
+      System.setProperty(MelipPropertiesConstants.PROP_KEY_MELIP_LOG_DIR, logDirPath);
+    }
+
+    return config;
   }
 
   /**
