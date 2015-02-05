@@ -3,12 +3,20 @@
  */
 package com.melip.webservices.common;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import com.melip.common.constants.CommonConstants;
+import com.melip.webservices.constants.MelipPropertiesConstants;
 
 /**
  * DAOクラスです。<br>
@@ -17,9 +25,11 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 public class Dao implements IDao {
 
   /** SQL実行用のSQLSession */
-  private SqlSessionFactory _sessionFactory;
+  private SqlSessionFactory sessionFactory;
   /** MyBatis設定ファイル名 */
   private String resourceFileName;
+  /** MELIP設定ファイルパス */
+  private String melipPropertiesPath;
 
   /**
    * コンストラクタ<br>
@@ -35,8 +45,19 @@ public class Dao implements IDao {
    */
   public void init() throws IOException {
 
+    String propFilePath = getMelipPropertiesPath();
+    if (StringUtils.isEmpty(propFilePath) || !new File(propFilePath).exists()) {
+      propFilePath =
+          this.getClass().getClassLoader()
+              .getResource(MelipPropertiesConstants.CLASS_PATH_DEFAULT_MELIP_PROPERTIES).getPath();
+    }
+
+    Properties props = new Properties();
+    props.load(new InputStreamReader(new FileInputStream(propFilePath),
+        CommonConstants.SYSTEM_CHARSET));
+
     InputStream in = Resources.getResourceAsStream(getResourceFileName());
-    _sessionFactory = new SqlSessionFactoryBuilder().build(in);
+    sessionFactory = new SqlSessionFactoryBuilder().build(in, props);
   }
 
   /**
@@ -44,7 +65,7 @@ public class Dao implements IDao {
    */
   @Override
   public SqlSessionFactory getSqlSessionFactory() {
-    return this._sessionFactory;
+    return this.sessionFactory;
   }
 
   /**
@@ -63,6 +84,24 @@ public class Dao implements IDao {
    */
   public void setResourceFileName(String resourceFileName) {
     this.resourceFileName = resourceFileName;
+  }
+
+  /**
+   * MELIP設定ファイルパスを取得します。
+   * 
+   * @return MELIP設定ファイルパス
+   */
+  public String getMelipPropertiesPath() {
+    return melipPropertiesPath;
+  }
+
+  /**
+   * MELIP設定ファイルパスを設定します。
+   * 
+   * @param melipPropertiesPath MELIP設定ファイルパス
+   */
+  public void setMelipPropertiesPath(String melipPropertiesPath) {
+    this.melipPropertiesPath = melipPropertiesPath;
   }
 
 }
