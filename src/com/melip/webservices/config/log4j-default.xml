@@ -27,12 +27,12 @@
   <!-- #################### loggerの設定 #################### -->
 
   <!-- SQL出力 -->
-  <logger name="com.melip.webservices.mapper" additivity="false">
-    <!-- levelを「debug」にするとSQLと結果の件数、「trace」にするとさらに結果の内容まで出力されます。 -->
-    <level value="debug" />
-    <appender-ref ref="stdout" />
-    <appender-ref ref="file" />
-  </logger>
+  <!-- levelを「debug」にするとSQLと結果の件数、「trace」にするとさらに結果の内容まで出力されます。 -->
+  <!-- <logger name="com.melip.webservices.mapper" additivity="false"> -->
+  <!-- <level value="debug" /> -->
+  <!-- <appender-ref ref="stdout" /> -->
+  <!-- <appender-ref ref="file" /> -->
+  <!-- </logger> -->
 
   <!-- デフォルト -->
   <root>
