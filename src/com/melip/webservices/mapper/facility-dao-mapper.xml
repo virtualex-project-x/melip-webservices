@@ -11,6 +11,7 @@
     <result property="longitude" column="longitude" />
     <collection property="attrDtoList" ofType="com.melip.common.dto.common.AttrDto">
       <id property="attrGrpId" column="attrGrpId" />
+      <result property="attrGrpAlias" column="attrGrpAlias" />
       <result property="attrGrpType" column="attrGrpType" />
       <result property="attrGrpNm" column="attrGrpNm" />
       <result property="attrVal" column="attrVal" />
@@ -43,6 +44,7 @@
       , a.LATITUDE             as latitude
       , a.LONGITUDE            as longitude
       , a.FACILITY_ATTR_GRP_ID as attrGrpId
+      , a.ALIAS                as attrGrpAlias
       , a.TYPE                 as attrGrpType
       , a.NM                   as attrGrpNm
       , case 
