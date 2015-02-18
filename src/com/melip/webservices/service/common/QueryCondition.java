@@ -15,7 +15,7 @@ public class QueryCondition implements IQueryCondition {
   /** パラメータのキー */
   private static final String KEY_PARAM = "p";
   /** デフォルトの件数 */
-  private static final Integer DEFAULT_COUNT = 999999;
+  public static final Integer DEFAULT_COUNT = 999999;
 
   /** 検索条件マップ */
   private Map<Object, Object> value = new HashMap<Object, Object>();
