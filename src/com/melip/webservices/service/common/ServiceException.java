@@ -8,6 +8,8 @@ import com.melip.webservices.system.MelipException;
  */
 public class ServiceException extends MelipException {
 
+  private static final long serialVersionUID = 1L;
+
   /** デフォルトのメッセージキー */
   public static final String DEFAULT_MESSAGE_KEY = MessageConstants.SVC_0001;
 

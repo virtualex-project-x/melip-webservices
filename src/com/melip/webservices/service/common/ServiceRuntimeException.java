@@ -8,6 +8,8 @@ import com.melip.webservices.system.MelipRuntimeException;
  */
 public class ServiceRuntimeException extends MelipRuntimeException {
 
+  private static final long serialVersionUID = 1L;
+
   /** デフォルトのメッセージキー */
   public static final String DEFAULT_MESSAGE_KEY = MessageConstants.SVC_0002;
 

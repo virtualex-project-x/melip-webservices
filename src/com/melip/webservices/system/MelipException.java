@@ -7,6 +7,8 @@ import com.melip.webservices.constants.MessageConstants;
  */
 public class MelipException extends Exception {
 
+  private static final long serialVersionUID = 1L;
+
   /** デフォルトのメッセージキー */
   public static final String DEFAULT_MESSAGE_KEY = MessageConstants.SYS_0001;
   /** 空のメッセージパラメータ */
@@ -83,6 +85,15 @@ public class MelipException extends Exception {
   @Override
   public String getMessage() {
     return MessageProvider.formatMessage(getMessageKey(), getMessageParams(), true);
+  }
+
+  /**
+   * メッセージキーなしのエラーメッセージを取得します。
+   * 
+   * @return メッセージキーなしのエラーメッセージ
+   */
+  public String getMessageWithoutKey() {
+    return MessageProvider.formatMessage(getMessageKey(), getMessageParams(), false);
   }
 
   /**
