@@ -28,6 +28,8 @@ import com.melip.webservices.resource.common.AbstractResource;
 import com.melip.webservices.resource.common.ResourceException;
 import com.melip.webservices.service.common.QueryCondition;
 import com.melip.webservices.service.facility.IFacilityService;
+import com.melip.webservices.system.MelipException;
+import com.melip.webservices.system.MelipRuntimeException;
 import com.melip.webservices.system.MessageProvider;
 
 /**
@@ -110,7 +112,11 @@ public class FacilityResource extends AbstractResource {
       facilityDtolist = service.getFacilityDtoList(queryCondition);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
-      return createErrorDto(e);
+      if (e instanceof MelipException || e instanceof MelipRuntimeException) {
+        return createErrorDto(e);
+      } else {
+        return createErrorDto(new MelipRuntimeException(e));
+      }
     }
 
     return createResourceDto(facilityDtolist);
