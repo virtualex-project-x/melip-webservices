@@ -2,6 +2,8 @@ package com.melip.webservices.dto;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import com.melip.common.dto.common.AbstractDto;
 import com.melip.common.dto.common.AttrDto;
 
@@ -27,6 +29,27 @@ public class FacilityDto extends AbstractDto {
   private Float longitude;
   /** 属性DTOリスト */
   private List<AttrDto> attrDtoList;
+
+  /**
+   * 属性グループエイリアスを元に属性値を取得します。
+   * 
+   * @param attrGrpAlias 属性グループエイリアス
+   * @return 属性値
+   */
+  public String getAttrVal(String attrGrpAlias) {
+
+    String attrVal = null;
+
+    if (CollectionUtils.isNotEmpty(getAttrDtoList())) {
+      for (AttrDto attrDto : getAttrDtoList()) {
+        if (attrGrpAlias.equals(attrDto.getAttrGrpAlias())) {
+          attrVal = attrDto.getAttrVal();
+        }
+      }
+    }
+
+    return attrVal;
+  }
 
   /**
    * 施設IDを取得します。

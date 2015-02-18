@@ -3,9 +3,13 @@ package com.melip.webservices.service.facility;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.comparators.ComparatorChain;
 
 import com.melip.webservices.common.DtoList;
 import com.melip.webservices.dto.FacilityDto;
+import com.melip.webservices.dto.FacilityDtoComparator;
 import com.melip.webservices.service.common.AbstractDataService;
 import com.melip.webservices.service.common.QueryCondition;
 
@@ -67,20 +71,17 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
    * @param facilityList 施設DTOリスト
    * @param condition 検索条件
    */
+  @SuppressWarnings("unchecked")
   private void sortFacilityList(List<FacilityDto> facilityList, QueryCondition condition) {
 
-    Collections.sort(facilityList, (FacilityDto1, FacilityDto2) -> {
-
-      // TODO:実装
-      // [参考]http://www.ne.jp/asahi/hishidama/home/tech/java/comparator.html#thenComparing
-
-
-
-        return 0;
-
+    Map<String, Boolean> orderMap = condition.getOrderBy();
+    if (null != orderMap && !orderMap.isEmpty()) {
+      ComparatorChain comparator = new ComparatorChain();
+      for (Map.Entry<String, Boolean> entry : orderMap.entrySet()) {
+        comparator.addComparator(new FacilityDtoComparator(entry.getKey(), entry.getValue(), true));
       }
-
-    );
+      Collections.sort(facilityList, comparator);
+    }
   }
 
   /**
