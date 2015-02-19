@@ -20,6 +20,8 @@ public class MessageConstants {
   public static final String SVC_0001 = "SVC-0001";
   /** サービスでシステムエラーが発生しました。 {@value} */
   public static final String SVC_0002 = "SVC-0002";
+  /** SQLの実行時にエラーが発生しました。 {@value} */
+  public static final String SVC_0003 = "SVC-0003";
 
   /** リソースで業務エラーが発生しました。 {@value} */
   public static final String RSC_0001 = "RSC-0001";
@@ -40,5 +42,7 @@ public class MessageConstants {
   public static final String CMN_0005 = "CMN-0005";
   /** ${0} の値が不正です。入力値 [${1}] {@value} */
   public static final String CMN_0006 = "CMN-0006";
+  /** ${0} は ${1} の形式で入力してください。入力値 [${2}] {@value} */
+  public static final String CMN_0007 = "CMN-0007";
 
 }
