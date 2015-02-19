@@ -48,9 +48,6 @@ public class FacilityListResource extends AbstractResource {
   /** パラメータ ソートキー */
   private static final String PARAM_ORDER = "order";
 
-  /** エンティティ名 */
-  private static final String ENTITY_NAME = "Facility";
-
   /**
    * 複数の施設情報をJSON形式で取得します。
    * 
@@ -82,7 +79,7 @@ public class FacilityListResource extends AbstractResource {
         for (String errMsg : errMsgList) {
           log.error(errMsg);
         }
-        return createResourceErrorDto(ENTITY_NAME, errMsgList);
+        return createResourceErrorDto(FacilityDto.ENTITY, errMsgList);
       }
 
       // 検索条件生成
@@ -97,10 +94,10 @@ public class FacilityListResource extends AbstractResource {
       facilityDtolist = service.getFacilityDtoList(queryCondition);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
-      return createResourceErrorDto(ENTITY_NAME, new MelipRuntimeException(e));
+      return createResourceErrorDto(FacilityDto.ENTITY, new MelipRuntimeException(e));
     }
 
-    return createResourceMultiDto(ENTITY_NAME, facilityDtolist);
+    return createResourceMultiDto(FacilityDto.ENTITY, facilityDtolist);
   }
 
   /**

@@ -34,9 +34,6 @@ public class FacilityResource extends AbstractResource {
   /** パラメータ 施設ID */
   private static final String PARAM_FACILITY_ID = "facilityId";
 
-  /** エンティティ名 */
-  private static final String ENTITY_NAME = "Facility";
-
   /**
    * 単体の施設情報をJSON形式で取得します。
    * 
@@ -61,7 +58,7 @@ public class FacilityResource extends AbstractResource {
         for (String errMsg : errMsgList) {
           log.error(errMsg);
         }
-        return createResourceErrorDto(ENTITY_NAME, errMsgList);
+        return createResourceErrorDto(FacilityDto.ENTITY, errMsgList);
       }
 
       // 施設DTOリスト取得
@@ -70,10 +67,10 @@ public class FacilityResource extends AbstractResource {
       facilityDto = service.getFacilityDto(langDiv, Integer.valueOf(facilityId));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
-      return createResourceErrorDto(ENTITY_NAME, new MelipRuntimeException(e));
+      return createResourceErrorDto(FacilityDto.ENTITY, new MelipRuntimeException(e));
     }
 
-    return createResourceSingleDto(ENTITY_NAME, facilityDto);
+    return createResourceSingleDto(FacilityDto.ENTITY, facilityDto);
   }
 
   /**

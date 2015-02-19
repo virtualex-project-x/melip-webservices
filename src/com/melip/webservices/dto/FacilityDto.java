@@ -12,6 +12,9 @@ import com.melip.common.dto.common.AttrDto;
  */
 public class FacilityDto extends AbstractDto {
 
+  /** エンティティ */
+  public static final String ENTITY = "Facility";
+
   /** 施設IDのフィールド名 */
   public static final String FIELD_FACILITY_ID = "facilityId";
   /** 緯度のフィールド名 */
