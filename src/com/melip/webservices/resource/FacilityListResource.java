@@ -26,7 +26,6 @@ import com.melip.webservices.resource.common.AbstractResource;
 import com.melip.webservices.resource.common.ResourceException;
 import com.melip.webservices.service.common.QueryCondition;
 import com.melip.webservices.service.facility.IFacilityService;
-import com.melip.webservices.system.MelipException;
 import com.melip.webservices.system.MelipRuntimeException;
 import com.melip.webservices.system.MessageProvider;
 
@@ -70,7 +69,7 @@ public class FacilityListResource extends AbstractResource {
       @QueryParam(PARAM_ATTR_GRP) String attrGrp, @QueryParam(PARAM_REGION_ID) String regionId,
       @QueryParam(PARAM_CONDITION) String condition, @QueryParam(PARAM_INDEX) String index,
       @QueryParam(PARAM_COUNT) String count, @QueryParam(PARAM_ORDER) String order) {
-    // TODO:テンプレートメソッドで共通化できそう
+
     DtoList<FacilityDto> facilityDtolist = null;
 
     try {
@@ -98,12 +97,7 @@ public class FacilityListResource extends AbstractResource {
       facilityDtolist = service.getFacilityDtoList(queryCondition);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
-      // Melip業務例外の場合はそのメッセージを返し、その他の場合はすべてシステムエラーとする
-      if (e instanceof MelipException) {
-        return createResourceErrorDto(ENTITY_NAME, e);
-      } else {
-        return createResourceErrorDto(ENTITY_NAME, new MelipRuntimeException(e));
-      }
+      return createResourceErrorDto(ENTITY_NAME, new MelipRuntimeException(e));
     }
 
     return createResourceMultiDto(ENTITY_NAME, facilityDtolist);

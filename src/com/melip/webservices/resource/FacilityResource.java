@@ -20,7 +20,6 @@ import com.melip.webservices.dto.FacilityDto;
 import com.melip.webservices.resource.common.AbstractResource;
 import com.melip.webservices.resource.common.ResourceException;
 import com.melip.webservices.service.facility.IFacilityService;
-import com.melip.webservices.system.MelipException;
 import com.melip.webservices.system.MelipRuntimeException;
 import com.melip.webservices.system.MessageProvider;
 
@@ -71,12 +70,7 @@ public class FacilityResource extends AbstractResource {
       facilityDto = service.getFacilityDto(langDiv, Integer.valueOf(facilityId));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
-      // Melip業務例外の場合はそのメッセージを返し、その他の場合はすべてシステムエラーとする
-      if (e instanceof MelipException) {
-        return createResourceErrorDto(ENTITY_NAME, e);
-      } else {
-        return createResourceErrorDto(ENTITY_NAME, new MelipRuntimeException(e));
-      }
+      return createResourceErrorDto(ENTITY_NAME, new MelipRuntimeException(e));
     }
 
     return createResourceSingleDto(ENTITY_NAME, facilityDto);
