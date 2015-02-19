@@ -59,7 +59,7 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
     DtoList<FacilityDto> facilityDtoList = new DtoList<FacilityDto>(cutFacilityList);
     facilityDtoList.setAllCount(allCount);
     facilityDtoList.setIndex(condition.getIndex());
-    facilityDtoList.setCount(condition.getCount());
+    facilityDtoList.setCount(cutFacilityList.size());
     facilityDtoList.setCondition(condition);
 
     return facilityDtoList;
@@ -95,15 +95,12 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
 
     int index = condition.getIndex();
     int count = condition.getCount();
+    List<FacilityDto> cutFacilityList = new ArrayList<FacilityDto>();
 
     if (index > facilityList.size()) {
-      // TODO:
-      // facilityListの件数よりも大きいインデックスを指定された場合エラーとするか
-      // nullを返してリストが空となるかどちらがよいか？
-      return null;
+      return cutFacilityList;
     }
 
-    List<FacilityDto> cutFacilityList = new ArrayList<FacilityDto>();
     for (int i = index; i < index + count; i++) {
       cutFacilityList.add(facilityList.get(i - 1));
       // リストの末尾に達した場合は終了
