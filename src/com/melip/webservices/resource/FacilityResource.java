@@ -97,10 +97,8 @@ public class FacilityResource extends AbstractResource {
     checkRequired(errMsgList, PARAM_LANG_DIV, langDiv);
     // 属性グループの形式チェック
     checkAttrGrp(errMsgList, PARAM_ATTR_GRP, attrGrp);
-    // 施設ID数値チェック
-    checkNumeric(errMsgList, PARAM_FACILITY_ID, facilityId);
-    // 施設ID範囲チェック
-    checkRange(errMsgList, PARAM_FACILITY_ID, facilityId, 1, null);
+    // 施設ID必須チェック
+    checkRequired(errMsgList, PARAM_FACILITY_ID, facilityId);
 
     return errMsgList;
   }
