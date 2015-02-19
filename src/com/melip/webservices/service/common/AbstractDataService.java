@@ -3,11 +3,11 @@ package com.melip.webservices.service.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.SqlSession;
 
 import com.melip.common.dto.common.IDto;
 import com.melip.webservices.common.IDao;
+import com.melip.webservices.constants.MessageConstants;
 
 /**
  * サービスの基底クラスです。<br>
@@ -36,12 +36,8 @@ public abstract class AbstractDataService extends AbstractService implements IDa
     T result = null;
     try {
       result = getSession().selectOne(sqlId, condition);
-    } catch (PersistenceException e) {
-      // TODO:例外処理
-      e.printStackTrace();
     } catch (Exception e) {
-      // TODO:例外処理
-      e.printStackTrace();
+      throw new ServiceRuntimeException(MessageConstants.SVC_0003, e);
     }
 
     return result;
@@ -65,12 +61,8 @@ public abstract class AbstractDataService extends AbstractService implements IDa
     List<E> resultList = new ArrayList<E>();
     try {
       resultList = getSession().selectList(sqlId, condition);
-    } catch (PersistenceException e) {
-      // TODO:例外処理
-      e.printStackTrace();
     } catch (Exception e) {
-      // TODO:例外処理
-      e.printStackTrace();
+      throw new ServiceRuntimeException(MessageConstants.SVC_0003, e);
     }
 
     return resultList;
