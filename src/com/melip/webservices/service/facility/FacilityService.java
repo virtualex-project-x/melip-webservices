@@ -118,9 +118,9 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
    */
   @Override
   public FacilityDto getFacilityDto(String langDiv, Integer facilityId) {
-    // TODO:ベタ書き
+
     QueryCondition condition = new QueryCondition(langDiv);
-    condition.setValue("facilityId", facilityId);
+    condition.setValue(FacilityDto.FIELD_FACILITY_ID, facilityId);
     return getFacilityDto(condition);
   }
 
