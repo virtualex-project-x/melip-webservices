@@ -1,7 +1,7 @@
 package com.melip.webservices.service.facility;
 
+import com.melip.common.dto.common.FacilityDto;
 import com.melip.webservices.common.DtoList;
-import com.melip.webservices.dto.FacilityDto;
 import com.melip.webservices.service.common.QueryCondition;
 
 /**

@@ -7,6 +7,8 @@ import java.util.Comparator;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.melip.common.dto.common.FacilityDto;
+
 /**
  * 施設DTO用のコンパレータです。
  */

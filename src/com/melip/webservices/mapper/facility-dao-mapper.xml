@@ -5,7 +5,7 @@
 <mapper namespace="com.melip.webservices.mapper.Facility">
 
   <!-- 施設DTO用resultMap -->
-  <resultMap id="facilityDtoResultMap" type="com.melip.webservices.dto.FacilityDto">
+  <resultMap id="facilityDtoResultMap" type="com.melip.common.dto.common.FacilityDto">
     <id property="facilityId" column="facilityId" />
     <result property="latitude" column="latitude" />
     <result property="longitude" column="longitude" />

@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.apache.commons.collections.comparators.ComparatorChain;
 
+import com.melip.common.dto.common.FacilityDto;
 import com.melip.webservices.common.DtoList;
-import com.melip.webservices.dto.FacilityDto;
 import com.melip.webservices.dto.FacilityDtoComparator;
 import com.melip.webservices.service.common.AbstractDataService;
 import com.melip.webservices.service.common.QueryCondition;

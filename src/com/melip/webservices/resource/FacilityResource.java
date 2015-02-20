@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import com.melip.common.constants.CommonConstants;
 import com.melip.common.dto.common.AbstractResourceDto;
+import com.melip.common.dto.common.FacilityDto;
 import com.melip.webservices.common.BeanCreator;
 import com.melip.webservices.constants.MessageConstants;
-import com.melip.webservices.dto.FacilityDto;
 import com.melip.webservices.resource.common.AbstractResource;
 import com.melip.webservices.resource.common.ResourceException;
 import com.melip.webservices.service.facility.IFacilityService;
