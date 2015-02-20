@@ -3,10 +3,11 @@ package com.melip.webservices.resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -43,12 +44,12 @@ public class FacilityResource extends AbstractResource {
    * @return 施設情報を保持したリソースシングルDTO、もしくはリソースエラーDTO
    */
   @GET
-  @Produces(CommonConstants.MEDIA_TYPE_JSON)
-  public AbstractResourceDto getFacility(@QueryParam(PARAM_LANG_DIV) String langDiv,
+  public Response getFacility(@QueryParam(PARAM_LANG_DIV) String langDiv,
       @QueryParam(PARAM_ATTR_GRP_ALIAS) String attrGrpAlias,
       @QueryParam(PARAM_FACILITY_ID) String facilityId) {
 
-    FacilityDto facilityDto = null;
+    int status = HttpServletResponse.SC_OK;
+    AbstractResourceDto resourceDto = null;
 
     try {
       // パラメータチェック
@@ -59,19 +60,23 @@ public class FacilityResource extends AbstractResource {
         for (String errMsg : errMsgList) {
           log.error(errMsg);
         }
-        return createResourceErrorDto(FacilityDto.ENTITY, errMsgList);
+        status = HttpServletResponse.SC_BAD_REQUEST;
+        resourceDto = createResourceErrorDto(FacilityDto.ENTITY, errMsgList);
+      } else {
+        // 施設DTOリスト取得
+        IFacilityService service =
+            BeanCreator.getBean(IFacilityService.SERVICE_NAME, IFacilityService.class);
+        FacilityDto facilityDto = service.getFacilityDto(langDiv, Integer.valueOf(facilityId));
+        resourceDto = createResourceSingleDto(FacilityDto.ENTITY, facilityDto);
       }
-
-      // 施設DTOリスト取得
-      IFacilityService service =
-          BeanCreator.getBean(IFacilityService.SERVICE_NAME, IFacilityService.class);
-      facilityDto = service.getFacilityDto(langDiv, Integer.valueOf(facilityId));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
-      return createResourceErrorDto(FacilityDto.ENTITY, new MelipRuntimeException(e));
+      status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+      resourceDto = createResourceErrorDto(FacilityDto.ENTITY, new MelipRuntimeException(e));
     }
 
-    return createResourceSingleDto(FacilityDto.ENTITY, facilityDto);
+    return Response.status(status).entity(resourceDto).type(CommonConstants.MEDIA_TYPE_JSON)
+        .build();
   }
 
   /**

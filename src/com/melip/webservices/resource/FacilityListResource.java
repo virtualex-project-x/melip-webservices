@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -61,14 +62,14 @@ public class FacilityListResource extends AbstractResource {
    * @return 施設情報を保持したリソースマルチDTO、もしくはリソースエラーDTO
    */
   @GET
-  @Produces(CommonConstants.MEDIA_TYPE_JSON)
-  public AbstractResourceDto getFacilityList(@QueryParam(PARAM_LANG_DIV) String langDiv,
+  public Response getFacilityList(@QueryParam(PARAM_LANG_DIV) String langDiv,
       @QueryParam(PARAM_ATTR_GRP_ALIAS) String attrGrpAlias,
       @QueryParam(PARAM_REGION_ID) String regionId, @QueryParam(PARAM_CONDITION) String condition,
       @QueryParam(PARAM_INDEX) String index, @QueryParam(PARAM_COUNT) String count,
       @QueryParam(PARAM_ORDER) String order) {
 
-    DtoList<FacilityDto> facilityDtolist = null;
+    int status = HttpServletResponse.SC_OK;
+    AbstractResourceDto resourceDto = null;
 
     try {
       // パラメータチェック
@@ -80,25 +81,29 @@ public class FacilityListResource extends AbstractResource {
         for (String errMsg : errMsgList) {
           log.error(errMsg);
         }
-        return createResourceErrorDto(FacilityDto.ENTITY, errMsgList);
+        status = HttpServletResponse.SC_BAD_REQUEST;
+        resourceDto = createResourceErrorDto(FacilityDto.ENTITY, errMsgList);
+      } else {
+        // 検索条件生成
+        FacilitySearchConditionDto facilityCondition =
+            createFacilitySearchCondition(attrGrpAlias, regionId, condition);
+        QueryCondition queryCondition = createQueryCondition(langDiv, index, count, order);
+        queryCondition.setParam(facilityCondition);
+
+        // 施設DTOリスト取得
+        IFacilityService service =
+            BeanCreator.getBean(IFacilityService.SERVICE_NAME, IFacilityService.class);
+        DtoList<FacilityDto> facilityDtolist = service.getFacilityDtoList(queryCondition);
+        resourceDto = createResourceMultiDto(FacilityDto.ENTITY, facilityDtolist);
       }
-
-      // 検索条件生成
-      FacilitySearchConditionDto facilityCondition =
-          createFacilitySearchCondition(attrGrpAlias, regionId, condition);
-      QueryCondition queryCondition = createQueryCondition(langDiv, index, count, order);
-      queryCondition.setParam(facilityCondition);
-
-      // 施設DTOリスト取得
-      IFacilityService service =
-          BeanCreator.getBean(IFacilityService.SERVICE_NAME, IFacilityService.class);
-      facilityDtolist = service.getFacilityDtoList(queryCondition);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
-      return createResourceErrorDto(FacilityDto.ENTITY, new MelipRuntimeException(e));
+      status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+      resourceDto = createResourceErrorDto(FacilityDto.ENTITY, new MelipRuntimeException(e));
     }
 
-    return createResourceMultiDto(FacilityDto.ENTITY, facilityDtolist);
+    return Response.status(status).entity(resourceDto).type(CommonConstants.MEDIA_TYPE_JSON)
+        .build();
   }
 
   /**
