@@ -38,20 +38,21 @@ public class FacilityResource extends AbstractResource {
    * 単体の施設情報をJSON形式で取得します。
    * 
    * @param langDiv 言語区分
-   * @param attrGrp 属性グループ
+   * @param attrGrpAlias 属性グループエイリアス
    * @param facilityId 施設ID
    * @return 施設情報を保持したリソースシングルDTO、もしくはリソースエラーDTO
    */
   @GET
   @Produces(CommonConstants.MEDIA_TYPE_JSON)
   public AbstractResourceDto getFacility(@QueryParam(PARAM_LANG_DIV) String langDiv,
-      @QueryParam(PARAM_ATTR_GRP) String attrGrp, @QueryParam(PARAM_FACILITY_ID) String facilityId) {
+      @QueryParam(PARAM_ATTR_GRP_ALIAS) String attrGrpAlias,
+      @QueryParam(PARAM_FACILITY_ID) String facilityId) {
 
     FacilityDto facilityDto = null;
 
     try {
       // パラメータチェック
-      List<String> errMsgList = checkParameters(langDiv, attrGrp, facilityId);
+      List<String> errMsgList = checkParameters(langDiv, attrGrpAlias, facilityId);
       // パラメータエラー
       if (CollectionUtils.isNotEmpty(errMsgList)) {
         log.error(MessageProvider.formatMessage(MessageConstants.RSC_0003));
@@ -77,26 +78,26 @@ public class FacilityResource extends AbstractResource {
    * パラメータチェックを行います。
    * 
    * @param langDiv 言語区分
-   * @param attrGrp 属性グループ
+   * @param attrGrpAlias 属性グループエイリアス
    * @param facilityId 施設ID
    * @return エラーメッセージリスト
    * @throws ResourceException
    */
-  private List<String> checkParameters(String langDiv, String attrGrp, String facilityId)
+  private List<String> checkParameters(String langDiv, String attrGrpAlias, String facilityId)
       throws ResourceException {
 
     if (log.isDebugEnabled()) {
       log.debug("【パラメータ情報】");
-      log.debug("  言語区分     -> " + langDiv);
-      log.debug("  属性グループ -> " + attrGrp);
-      log.debug("  施設ID       -> " + facilityId);
+      log.debug("  言語区分               -> " + langDiv);
+      log.debug("  属性グループエイリアス -> " + attrGrpAlias);
+      log.debug("  施設ID                 -> " + facilityId);
     }
 
     List<String> errMsgList = new ArrayList<String>();
     // 言語区分必須チェック
     checkRequired(errMsgList, PARAM_LANG_DIV, langDiv);
-    // 属性グループの形式チェック
-    checkAttrGrp(errMsgList, PARAM_ATTR_GRP, attrGrp);
+    // 属性グループエイリアスの形式チェック
+    checkAttrGrpAlias(errMsgList, PARAM_ATTR_GRP_ALIAS, attrGrpAlias);
     // 施設ID必須チェック
     checkRequired(errMsgList, PARAM_FACILITY_ID, facilityId);
 

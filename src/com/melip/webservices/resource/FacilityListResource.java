@@ -52,7 +52,7 @@ public class FacilityListResource extends AbstractResource {
    * 複数の施設情報をJSON形式で取得します。
    * 
    * @param langDiv 言語区分
-   * @param attrGrp 属性グループ
+   * @param attrGrpAlias 属性グループエイリアス
    * @param regionId 地域ID
    * @param condition 検索条件
    * @param index 開始位置
@@ -63,16 +63,17 @@ public class FacilityListResource extends AbstractResource {
   @GET
   @Produces(CommonConstants.MEDIA_TYPE_JSON)
   public AbstractResourceDto getFacilityList(@QueryParam(PARAM_LANG_DIV) String langDiv,
-      @QueryParam(PARAM_ATTR_GRP) String attrGrp, @QueryParam(PARAM_REGION_ID) String regionId,
-      @QueryParam(PARAM_CONDITION) String condition, @QueryParam(PARAM_INDEX) String index,
-      @QueryParam(PARAM_COUNT) String count, @QueryParam(PARAM_ORDER) String order) {
+      @QueryParam(PARAM_ATTR_GRP_ALIAS) String attrGrpAlias,
+      @QueryParam(PARAM_REGION_ID) String regionId, @QueryParam(PARAM_CONDITION) String condition,
+      @QueryParam(PARAM_INDEX) String index, @QueryParam(PARAM_COUNT) String count,
+      @QueryParam(PARAM_ORDER) String order) {
 
     DtoList<FacilityDto> facilityDtolist = null;
 
     try {
       // パラメータチェック
       List<String> errMsgList =
-          checkParameters(langDiv, attrGrp, regionId, condition, index, count, order);
+          checkParameters(langDiv, attrGrpAlias, regionId, condition, index, count, order);
       // パラメータエラー
       if (CollectionUtils.isNotEmpty(errMsgList)) {
         log.error(MessageProvider.formatMessage(MessageConstants.RSC_0003));
@@ -84,7 +85,7 @@ public class FacilityListResource extends AbstractResource {
 
       // 検索条件生成
       FacilitySearchConditionDto facilityCondition =
-          createFacilitySearchCondition(attrGrp, regionId, condition);
+          createFacilitySearchCondition(attrGrpAlias, regionId, condition);
       QueryCondition queryCondition = createQueryCondition(langDiv, index, count, order);
       queryCondition.setParam(facilityCondition);
 
@@ -104,7 +105,7 @@ public class FacilityListResource extends AbstractResource {
    * パラメータチェックを行います。
    * 
    * @param langDiv 言語区分
-   * @param attrGrp 属性グループ
+   * @param attrGrpAlias 属性グループエイリアス
    * @param regionId 地域ID
    * @param condition 検索条件
    * @param index 開始位置
@@ -113,25 +114,25 @@ public class FacilityListResource extends AbstractResource {
    * @return エラーメッセージリスト
    * @throws ResourceException
    */
-  private List<String> checkParameters(String langDiv, String attrGrp, String regionId,
+  private List<String> checkParameters(String langDiv, String attrGrpAlias, String regionId,
       String condition, String index, String count, String order) throws ResourceException {
 
     if (log.isDebugEnabled()) {
       log.debug("【パラメータ情報】");
-      log.debug("  言語区分     -> " + langDiv);
-      log.debug("  属性グループ -> " + attrGrp);
-      log.debug("  地域ID       -> " + regionId);
-      log.debug("  検索条件     -> " + condition);
-      log.debug("  開始位置     -> " + index);
-      log.debug("  件数         -> " + count);
-      log.debug("  ソートキー   -> " + order);
+      log.debug("  言語区分               -> " + langDiv);
+      log.debug("  属性グループエイリアス -> " + attrGrpAlias);
+      log.debug("  地域ID                 -> " + regionId);
+      log.debug("  検索条件               -> " + condition);
+      log.debug("  開始位置               -> " + index);
+      log.debug("  件数                   -> " + count);
+      log.debug("  ソートキー             -> " + order);
     }
 
     List<String> errMsgList = new ArrayList<String>();
     // 言語区分必須チェック
     checkRequired(errMsgList, PARAM_LANG_DIV, langDiv);
-    // 属性グループの形式チェック
-    checkAttrGrp(errMsgList, PARAM_ATTR_GRP, attrGrp);
+    // 属性グループエイリアスの形式チェック
+    checkAttrGrpAlias(errMsgList, PARAM_ATTR_GRP_ALIAS, attrGrpAlias);
     // 地域ID数値チェック
     checkNumeric(errMsgList, PARAM_REGION_ID, regionId);
     // 地域ID範囲チェック
@@ -155,19 +156,20 @@ public class FacilityListResource extends AbstractResource {
   /**
    * 施設検索条件DTOを生成します。
    * 
-   * @param attrGrp 属性グループ
+   * @param attrGrpAlias 属性グループエイリアス
    * @param regionId 地域ID
    * @param condition 検索条件
    * @return
    */
-  private FacilitySearchConditionDto createFacilitySearchCondition(String attrGrp, String regionId,
-      String condition) {
+  private FacilitySearchConditionDto createFacilitySearchCondition(String attrGrpAlias,
+      String regionId, String condition) {
 
     FacilitySearchConditionDto facilityConditionDto = new FacilitySearchConditionDto();
 
     // 取得対象属性グループエイリアスリスト
-    if (StringUtils.isNotEmpty(attrGrp)) {
-      facilityConditionDto.setTargetAttrGrpAliasList(Arrays.asList(attrGrp.split(SEPARATOR_ITEM)));
+    if (StringUtils.isNotEmpty(attrGrpAlias)) {
+      facilityConditionDto.setTargetAttrGrpAliasList(Arrays.asList(attrGrpAlias
+          .split(SEPARATOR_ITEM)));
     }
 
     // 地域ID

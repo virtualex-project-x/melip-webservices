@@ -23,8 +23,8 @@ public abstract class AbstractResource implements IResource {
 
   /** パラメータ 言語区分 */
   protected static final String PARAM_LANG_DIV = "langDiv";
-  /** パラメータ 属性グループ */
-  protected static final String PARAM_ATTR_GRP = "attrGrp";
+  /** パラメータ 属性グループエイリアス */
+  protected static final String PARAM_ATTR_GRP_ALIAS = "attrGrpAlias";
 
   /** 項目のセパレータ */
   protected static final String SEPARATOR_ITEM = ",";
@@ -33,19 +33,19 @@ public abstract class AbstractResource implements IResource {
   /** 昇順を表す文字列 */
   protected static final String STR_ASC = "asc";
 
-  /** 属性グループの正規表現 */
-  private static final String REGEX_ATTR_GRP = "^([^,]+,)*[^,]+$";
+  /** 属性グループエイリアスの正規表現 */
+  private static final String REGEX_ATTR_GRP_ALIAS = "^([^,]+,)*[^,]+$";
   /** 検索条件の正規表現 */
   private static final String REGEX_CONDITION = "^([^,:]+:[^,:]+,)*[^,:]+:[^,:]+$";
   /** ソートキーの正規表現 */
   private static final String REGEX_ORDER = "^([^,:]+:(asc|desc),)*[^,:]+:(asc|desc)$";
 
-  /** 属性グループが不正だった場合に表示する形式 */
-  private static final String MSG_ATTR_GRP_PATTERN = "attrGrp,attrGrp,...";
+  /** 属性グループエイリアスが不正だった場合に表示する形式 */
+  private static final String MSG_ATTR_GRP_ALIAS_PATTERN = "attrGrpAlias,attrGrpAlias,...";
   /** 検索条件が不正だった場合に表示する形式 */
-  private static final String MSG_CONDITION_PATTERN = "attrGrp:value,attrGrp:value,...";
+  private static final String MSG_CONDITION_PATTERN = "attrGrpAlias:value,attrGrpAlias:value,...";
   /** ソートキーが不正だった場合に表示する形式 */
-  private static final String MSG_ORDER_PATTERN = "attrGrp:asc/desc,attrGrp:asc/desc,...";
+  private static final String MSG_ORDER_PATTERN = "attrGrpAlias:asc/desc,attrGrpAlias:asc/desc,...";
 
   /**
    * 必須チェックを実施します。
@@ -124,21 +124,21 @@ public abstract class AbstractResource implements IResource {
   }
 
   /**
-   * 属性グループのチェックを実施します。
+   * 属性グループエイリアスのチェックを実施します。
    * 
    * @param errMsgList エラーメッセージリスト
    * @param paramName パラメータの名前
    * @param paramValue パラメータの値
    */
-  protected void checkAttrGrp(List<String> errMsgList, String paramName, String paramValue) {
+  protected void checkAttrGrpAlias(List<String> errMsgList, String paramName, String paramValue) {
 
     if (StringUtils.isEmpty(paramValue)) {
       return;
     }
 
-    if (!checkRegex(paramValue, REGEX_ATTR_GRP)) {
+    if (!checkRegex(paramValue, REGEX_ATTR_GRP_ALIAS)) {
       errMsgList.add(MessageProvider.formatMessage(MessageConstants.CMN_0007, new Object[] {
-          paramName, MSG_ATTR_GRP_PATTERN, paramValue}));
+          paramName, MSG_ATTR_GRP_ALIAS_PATTERN, paramValue}));
     }
   }
 
