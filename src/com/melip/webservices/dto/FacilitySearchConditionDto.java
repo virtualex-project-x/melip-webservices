@@ -9,6 +9,8 @@ import com.melip.common.dto.common.AbstractDto;
  */
 public class FacilitySearchConditionDto extends AbstractDto {
 
+  private static final long serialVersionUID = 1L;
+
   /** 取得対象属性グループエイリアスリストのフィールド名 */
   public static final String FIELD_TARGET_ATTR_GRP_ALIAS_LIST = "targetAttrGrpAliasList";
   /** 地域IDのフィールド名 */

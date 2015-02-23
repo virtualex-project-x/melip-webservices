@@ -7,6 +7,8 @@ import com.melip.common.dto.common.AbstractDto;
  */
 public class AttrGrpSearchConditionDto extends AbstractDto {
 
+  private static final long serialVersionUID = 1L;
+
   /** 検索対象属性グループエイリアスのフィールド名 */
   public static final String FIELD_ATTR_GRP_ALIAS = "attrGrpAlias";
   /** 検索値のフィールド名 */
