@@ -146,7 +146,7 @@ public abstract class AbstractResource implements IResource {
         }
       }
     } catch (NumberFormatException e) {
-      // paramValueが数値でない場合は何もしない
+      // paramValue、min、maxが数値でない場合は何もしない
     }
   }
 
