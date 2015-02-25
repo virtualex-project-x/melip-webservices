@@ -20,6 +20,12 @@ public class FacilitySearchConditionDto extends AbstractDto {
       "attrGrpSearchConditionDtoList";
   /** 属性グループ検索条件の個数のフィールド名 */
   public static final String FIELD_NUM_OF_SEARCH_CONDITION = "numOfSearchCondition";
+  /** 緯度のフィールド名 */
+  public static final String FIELD_LATITUDE = "latitude";
+  /** 経度のフィールド名 */
+  public static final String FIELD_LONGITUDE = "longitude";
+  /** 半径のフィールド名 */
+  public static final String FIELD_RADIUS = "radius";
 
   /** 取得対象属性グループエイリアスリスト */
   private List<String> targetAttrGrpAliasList;
@@ -29,6 +35,12 @@ public class FacilitySearchConditionDto extends AbstractDto {
   private List<AttrGrpSearchConditionDto> attrGrpSearchConditionDtoList;
   /** 属性グループ検索条件の個数 */
   private Integer numOfSearchCondition;
+  /** 緯度 */
+  private Float latitude;
+  /** 経度 */
+  private Float longitude;
+  /** 半径 */
+  private Float radius;
 
   /**
    * 取得対象属性グループエイリアスリストを取得します。
@@ -101,6 +113,60 @@ public class FacilitySearchConditionDto extends AbstractDto {
    */
   public void setNumOfSearchCondition(Integer numOfSearchCondition) {
     this.numOfSearchCondition = numOfSearchCondition;
+  }
+
+  /**
+   * 緯度を取得します。
+   * 
+   * @return 緯度
+   */
+  public Float getlatitude() {
+    return latitude;
+  }
+
+  /**
+   * 緯度を設定します。
+   * 
+   * @param latitude 緯度
+   */
+  public void setlatitude(Float latitude) {
+    this.latitude = latitude;
+  }
+
+  /**
+   * 経度を取得します。
+   * 
+   * @return 経度
+   */
+  public Float getlongitude() {
+    return longitude;
+  }
+
+  /**
+   * 経度を設定します。
+   * 
+   * @param longitude 経度
+   */
+  public void setlongitude(Float longitude) {
+    this.longitude = longitude;
+  }
+
+  /**
+   * 半径を取得します。
+   * 
+   * @return 半径
+   */
+  public Float getradius() {
+    return radius;
+  }
+
+  /**
+   * 半径を設定します。
+   * 
+   * @param radius 半径
+   */
+  public void setradius(Float radius) {
+    this.radius = radius;
   }
 
 }

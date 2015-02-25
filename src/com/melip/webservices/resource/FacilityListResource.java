@@ -48,6 +48,15 @@ public class FacilityListResource extends AbstractResource {
   private static final String PARAM_COUNT = "count";
   /** パラメータ ソートキー */
   private static final String PARAM_ORDER = "order";
+  /** パラメータ 緯度 */
+  private static final String PARAM_LATITUDE = "lat";
+  /** パラメータ 経度 */
+  private static final String PARAM_LONGITUDE = "lon";
+  /** パラメータ 半径 */
+  private static final String PARAM_RADIUS = "r";
+
+  /** デフォルトの半径（km） */
+  private static final Float RADIUS_DEFAULT = 0.5F;
 
   /**
    * 複数の施設情報をJSON形式で取得します。
@@ -66,7 +75,8 @@ public class FacilityListResource extends AbstractResource {
       @QueryParam(PARAM_ATTR_GRP_ALIAS) String attrGrpAlias,
       @QueryParam(PARAM_REGION_ID) String regionId, @QueryParam(PARAM_CONDITION) String condition,
       @QueryParam(PARAM_INDEX) String index, @QueryParam(PARAM_COUNT) String count,
-      @QueryParam(PARAM_ORDER) String order) {
+      @QueryParam(PARAM_ORDER) String order, @QueryParam(PARAM_LATITUDE) String latitude,
+      @QueryParam(PARAM_LONGITUDE) String longitude, @QueryParam(PARAM_RADIUS) String radius) {
 
     int status = HttpServletResponse.SC_OK;
     AbstractResourceDto resourceDto = null;
@@ -74,7 +84,8 @@ public class FacilityListResource extends AbstractResource {
     try {
       // パラメータチェック
       List<String> errMsgList =
-          checkParameters(langDiv, attrGrpAlias, regionId, condition, index, count, order);
+          checkParameters(langDiv, attrGrpAlias, regionId, condition, index, count, order,
+              latitude, longitude, radius);
       // パラメータエラー
       if (CollectionUtils.isNotEmpty(errMsgList)) {
         log.error(MessageProvider.formatMessage(MessageConstants.RSC_0003));
@@ -86,7 +97,8 @@ public class FacilityListResource extends AbstractResource {
       } else {
         // 検索条件生成
         FacilitySearchConditionDto facilityCondition =
-            createFacilitySearchCondition(attrGrpAlias, regionId, condition);
+            createFacilitySearchCondition(attrGrpAlias, regionId, condition, latitude, longitude,
+                radius);
         QueryCondition queryCondition = createQueryCondition(langDiv, index, count, order);
         queryCondition.setParam(facilityCondition);
 
@@ -116,11 +128,15 @@ public class FacilityListResource extends AbstractResource {
    * @param index 開始位置
    * @param count 件数
    * @param order ソートキー
+   * @param latitude 緯度
+   * @param longitude 経度
+   * @param radius 半径
    * @return エラーメッセージリスト
    * @throws ResourceException
    */
   private List<String> checkParameters(String langDiv, String attrGrpAlias, String regionId,
-      String condition, String index, String count, String order) throws ResourceException {
+      String condition, String index, String count, String order, String latitude,
+      String longitude, String radius) throws ResourceException {
 
     if (log.isDebugEnabled()) {
       log.debug("【パラメータ情報】");
@@ -131,6 +147,9 @@ public class FacilityListResource extends AbstractResource {
       log.debug("  開始位置               -> " + index);
       log.debug("  件数                   -> " + count);
       log.debug("  ソートキー             -> " + order);
+      log.debug("  緯度                   -> " + latitude);
+      log.debug("  経度                   -> " + longitude);
+      log.debug("  半径                   -> " + radius);
     }
 
     List<String> errMsgList = new ArrayList<String>();
@@ -138,22 +157,34 @@ public class FacilityListResource extends AbstractResource {
     checkRequired(errMsgList, PARAM_LANG_DIV, langDiv);
     // 属性グループエイリアスの形式チェック
     checkAttrGrpAlias(errMsgList, PARAM_ATTR_GRP_ALIAS, attrGrpAlias);
-    // 地域ID数値チェック
-    checkNumeric(errMsgList, PARAM_REGION_ID, regionId);
+    // 地域ID整数チェック
+    checkInteger(errMsgList, PARAM_REGION_ID, regionId);
     // 地域ID範囲チェック
     checkRange(errMsgList, PARAM_REGION_ID, regionId, 1, null);
     // 検索条件の形式チェック
     checkCondition(errMsgList, PARAM_CONDITION, condition);
-    // 開始位置数値チェック
-    checkNumeric(errMsgList, PARAM_INDEX, index);
+    // 開始位置整数チェック
+    checkInteger(errMsgList, PARAM_INDEX, index);
     // 開始位置範囲チェック
     checkRange(errMsgList, PARAM_INDEX, index, 1, QueryCondition.DEFAULT_COUNT);
-    // 件数数値チェック
-    checkNumeric(errMsgList, PARAM_COUNT, count);
+    // 件数整数チェック
+    checkInteger(errMsgList, PARAM_COUNT, count);
     // 件数範囲チェック
     checkRange(errMsgList, PARAM_COUNT, count, 1, QueryCondition.DEFAULT_COUNT);
     // ソートキーの形式チェック
     checkOrder(errMsgList, PARAM_ORDER, order);
+    // 緯度の数値チェック
+    checkDecimal(errMsgList, PARAM_LATITUDE, latitude);
+    // 緯度の範囲チェック
+    checkRange(errMsgList, PARAM_LATITUDE, latitude, 0, 90);
+    // 経度の数値チェック
+    checkDecimal(errMsgList, PARAM_LONGITUDE, longitude);
+    // 経度の範囲チェック
+    checkRange(errMsgList, PARAM_LONGITUDE, longitude, -180, 180);
+    // 半径の数値チェック
+    checkDecimal(errMsgList, PARAM_RADIUS, radius);
+    // 半径の範囲チェック
+    checkRange(errMsgList, PARAM_RADIUS, radius, 0, null);
 
     return errMsgList;
   }
@@ -167,7 +198,7 @@ public class FacilityListResource extends AbstractResource {
    * @return
    */
   private FacilitySearchConditionDto createFacilitySearchCondition(String attrGrpAlias,
-      String regionId, String condition) {
+      String regionId, String condition, String latitude, String longitude, String radius) {
 
     FacilitySearchConditionDto facilityConditionDto = new FacilitySearchConditionDto();
 
@@ -197,6 +228,17 @@ public class FacilityListResource extends AbstractResource {
       }
       facilityConditionDto.setAttrGrpSearchConditionDtoList(attrGrpConditionList);
       facilityConditionDto.setNumOfSearchCondition(attrGrpConditionList.size());
+    }
+
+    // 緯度・経度・半径
+    if (StringUtils.isNotEmpty(latitude) && StringUtils.isNotEmpty(longitude)) {
+      facilityConditionDto.setlatitude(Float.valueOf(latitude));
+      facilityConditionDto.setlongitude(Float.valueOf(longitude));
+      if (StringUtils.isNotEmpty(radius)) {
+        facilityConditionDto.setradius(RADIUS_DEFAULT);
+      } else {
+        facilityConditionDto.setradius(Float.valueOf(radius));
+      }
     }
 
     return facilityConditionDto;

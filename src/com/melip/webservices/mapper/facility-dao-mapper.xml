@@ -126,6 +126,15 @@
               </if>
             )
           </if>
+          <if test="p.latitude != null and p.longitude != null and p.radius != null">
+            and (
+              6371 * ACOS(
+                COS(RADIANS(#{p.latitude})) * COS(RADIANS(f1.LATITUDE)) * COS(RADIANS(f1.LONGITUDE) - RADIANS(#{p.longitude}))
+                +
+                SIN(RADIANS(#{p.latitude})) * SIN(RADIANS(f1.LATITUDE))
+              )
+            ) &lt;= #{p.radius}
+          </if>
       ) a 
       left outer join v_cd cd 
         on a.CD_GRP_ID = cd.CD_GRP_ID 

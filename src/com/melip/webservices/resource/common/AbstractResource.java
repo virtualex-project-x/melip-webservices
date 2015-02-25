@@ -63,13 +63,13 @@ public abstract class AbstractResource implements IResource {
   }
 
   /**
-   * 数値チェックを実施します。
-   * 
+   * 整数チェックを実施します。
+   *
    * @param errMsgList エラーメッセージリスト
    * @param paramName パラメータの名前
    * @param paramValue パラメータの値
    */
-  protected void checkNumeric(List<String> errMsgList, String paramName, String paramValue) {
+  protected void checkInteger(List<String> errMsgList, String paramName, String paramValue) {
 
     if (StringUtils.isEmpty(paramValue)) {
       return;
@@ -79,6 +79,27 @@ public abstract class AbstractResource implements IResource {
       Integer.valueOf(paramValue);
     } catch (NumberFormatException e) {
       errMsgList.add(MessageProvider.formatMessage(MessageConstants.CMN_0005, new Object[] {
+          paramName, paramValue}));
+    }
+  }
+
+  /**
+   * 数値チェックを実施します。
+   *
+   * @param errMsgList エラーメッセージリスト
+   * @param paramName パラメータの名前
+   * @param paramValue パラメータの値
+   */
+  protected void checkDecimal(List<String> errMsgList, String paramName, String paramValue) {
+
+    if (StringUtils.isEmpty(paramValue)) {
+      return;
+    }
+
+    try {
+      Float.valueOf(paramValue);
+    } catch (NumberFormatException e) {
+      errMsgList.add(MessageProvider.formatMessage(MessageConstants.CMN_0008, new Object[] {
           paramName, paramValue}));
     }
   }
@@ -100,22 +121,28 @@ public abstract class AbstractResource implements IResource {
       return;
     }
 
+    Float minF = null;
+    Float maxF = null;
     try {
-      Integer value = Integer.valueOf(paramValue);
+      Float value = Float.valueOf(paramValue);
       if (null != min && null != max) {
-        if (min.compareTo(value) > 0 || max.compareTo(value) < 0) {
+        minF = Float.valueOf(min);
+        maxF = Float.valueOf(max);
+        if (minF.compareTo(value) > 0 || maxF.compareTo(value) < 0) {
           errMsgList.add(MessageProvider.formatMessage(MessageConstants.CMN_0002, new Object[] {
-              paramName, min, max, value}));
+              paramName, min, max, paramValue}));
         }
       } else if (null != min) {
-        if (min.compareTo(value) > 0) {
+        minF = Float.valueOf(min);
+        if (minF.compareTo(value) > 0) {
           errMsgList.add(MessageProvider.formatMessage(MessageConstants.CMN_0003, new Object[] {
-              paramName, min, value}));
+              paramName, min, paramValue}));
         }
       } else if (null != max) {
-        if (max.compareTo(value) < 0) {
+        maxF = Float.valueOf(max);
+        if (maxF.compareTo(value) < 0) {
           errMsgList.add(MessageProvider.formatMessage(MessageConstants.CMN_0004, new Object[] {
-              paramName, max, value}));
+              paramName, max, paramValue}));
         }
       }
     } catch (NumberFormatException e) {
