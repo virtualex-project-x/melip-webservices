@@ -42,9 +42,19 @@ public class FacilityDtoComparator implements Comparator<FacilityDto> {
   @Override
   public int compare(FacilityDto facilityDto1, FacilityDto facilityDto2) {
 
+    String val1 = null;
+    String val2 = null;
+    String attrGrpAlias = getAttrGrpAlias();
+
+    if (FacilityDto.FIELD_DISTANCE.equals(attrGrpAlias)) {
+      val1 = null == facilityDto1.getDistance() ? null : String.valueOf(facilityDto1.getDistance());
+      val2 = null == facilityDto2.getDistance() ? null : String.valueOf(facilityDto2.getDistance());
+    } else {
+      val1 = facilityDto1.getAttrVal(getAttrGrpAlias());
+      val2 = facilityDto2.getAttrVal(getAttrGrpAlias());
+    }
+
     int returnVal = 0;
-    String val1 = facilityDto1.getAttrVal(getAttrGrpAlias());
-    String val2 = facilityDto2.getAttrVal(getAttrGrpAlias());
 
     // 両方null
     if (StringUtils.isEmpty(val1) && StringUtils.isEmpty(val2)) {
@@ -68,7 +78,11 @@ public class FacilityDtoComparator implements Comparator<FacilityDto> {
     }
     // 両方nullでない
     else {
-      returnVal = val1.compareTo(val2);
+      if (FacilityDto.FIELD_DISTANCE.equals(attrGrpAlias)) {
+        returnVal = facilityDto1.getDistance().compareTo(facilityDto2.getDistance());
+      } else {
+        returnVal = val1.compareTo(val2);
+      }
     }
 
     return isAsc ? returnVal : returnVal * -1;
