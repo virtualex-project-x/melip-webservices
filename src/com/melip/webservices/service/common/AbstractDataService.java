@@ -38,6 +38,8 @@ public abstract class AbstractDataService extends AbstractService implements IDa
       result = getSession().selectOne(sqlId, condition);
     } catch (Exception e) {
       throw new ServiceRuntimeException(MessageConstants.SVC_0003, e);
+    } finally {
+      getSession().close();
     }
 
     return result;
@@ -63,6 +65,8 @@ public abstract class AbstractDataService extends AbstractService implements IDa
       resultList = getSession().selectList(sqlId, condition);
     } catch (Exception e) {
       throw new ServiceRuntimeException(MessageConstants.SVC_0003, e);
+    } finally {
+      getSession().close();
     }
 
     return resultList;
