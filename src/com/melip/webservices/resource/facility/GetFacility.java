@@ -1,12 +1,10 @@
-package com.melip.webservices.resource;
+package com.melip.webservices.resource.facility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -19,41 +17,33 @@ import com.melip.common.dto.common.FacilityDto;
 import com.melip.webservices.common.BeanCreator;
 import com.melip.webservices.constants.MessageConstants;
 import com.melip.webservices.resource.common.AbstractResource;
-import com.melip.webservices.resource.common.ResourceException;
 import com.melip.webservices.service.facility.IFacilityService;
 import com.melip.webservices.system.MelipRuntimeException;
 import com.melip.webservices.system.MessageProvider;
 
 /**
- * 単体の施設情報を取得するクラスです。
+ * 施設情報を取得するクラスです。
  */
-@Path("/facility")
-public class FacilityResource extends AbstractResource {
+public class GetFacility extends AbstractResource {
 
-  private static final Logger log = LoggerFactory.getLogger(FacilityResource.class);
-
-  /** パラメータ 施設ID */
-  private static final String PARAM_FACILITY_ID = "facilityId";
+  private static final Logger log = LoggerFactory.getLogger(GetFacility.class);
 
   /**
    * 単体の施設情報をJSON形式で取得します。
    * 
+   * @param facilityId 施設ID
    * @param langDiv 言語区分
    * @param attrGrpAlias 属性グループエイリアス
-   * @param facilityId 施設ID
    * @return 施設情報を保持したリソースシングルDTO、もしくはリソースエラーDTO
    */
-  @GET
-  public Response getFacility(@QueryParam(PARAM_LANG_DIV) String langDiv,
-      @QueryParam(PARAM_ATTR_GRP_ALIAS) String attrGrpAlias,
-      @QueryParam(PARAM_FACILITY_ID) String facilityId) {
+  public Response getFacility(int facilityId, String langDiv, String attrGrpAlias) {
 
     int status = HttpServletResponse.SC_OK;
     AbstractResourceDto resourceDto = null;
 
     try {
       // パラメータチェック
-      List<String> errMsgList = checkParameters(langDiv, attrGrpAlias, facilityId);
+      List<String> errMsgList = checkParameters(facilityId, langDiv, attrGrpAlias);
       // パラメータエラー
       if (CollectionUtils.isNotEmpty(errMsgList)) {
         log.error(MessageProvider.formatMessage(MessageConstants.RSC_0003));
@@ -66,8 +56,16 @@ public class FacilityResource extends AbstractResource {
         // 施設DTOリスト取得
         IFacilityService service =
             BeanCreator.getBean(IFacilityService.SERVICE_NAME, IFacilityService.class);
-        FacilityDto facilityDto = service.getFacilityDto(langDiv, Integer.valueOf(facilityId));
-        resourceDto = createResourceSingleDto(FacilityDto.ENTITY, facilityDto);
+        FacilityDto facilityDto = service.getFacilityDto(langDiv, facilityId);
+        // 取得できなかった場合
+        if (null == facilityDto) {
+          status = HttpServletResponse.SC_NOT_FOUND;
+          resourceDto =
+              createResourceErrorDto(FacilityDto.ENTITY,
+                  Arrays.asList(MessageProvider.formatMessage(MessageConstants.RSC_0004)));
+        } else {
+          resourceDto = createResourceSingleDto(FacilityDto.ENTITY, facilityDto);
+        }
       }
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -82,20 +80,18 @@ public class FacilityResource extends AbstractResource {
   /**
    * パラメータチェックを行います。
    * 
+   * @param facilityId 施設ID
    * @param langDiv 言語区分
    * @param attrGrpAlias 属性グループエイリアス
-   * @param facilityId 施設ID
    * @return エラーメッセージリスト
-   * @throws ResourceException
    */
-  private List<String> checkParameters(String langDiv, String attrGrpAlias, String facilityId)
-      throws ResourceException {
+  private List<String> checkParameters(int facilityId, String langDiv, String attrGrpAlias) {
 
     if (log.isDebugEnabled()) {
       log.debug("【パラメータ情報】");
+      log.debug("  施設ID                 -> " + facilityId);
       log.debug("  言語区分               -> " + langDiv);
       log.debug("  属性グループエイリアス -> " + attrGrpAlias);
-      log.debug("  施設ID                 -> " + facilityId);
     }
 
     List<String> errMsgList = new ArrayList<String>();
@@ -103,8 +99,6 @@ public class FacilityResource extends AbstractResource {
     checkRequired(errMsgList, PARAM_LANG_DIV, langDiv);
     // 属性グループエイリアスの形式チェック
     checkAttrGrpAlias(errMsgList, PARAM_ATTR_GRP_ALIAS, attrGrpAlias);
-    // 施設ID必須チェック
-    checkRequired(errMsgList, PARAM_FACILITY_ID, facilityId);
 
     return errMsgList;
   }

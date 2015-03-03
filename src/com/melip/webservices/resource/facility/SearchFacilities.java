@@ -1,13 +1,10 @@
-package com.melip.webservices.resource;
+package com.melip.webservices.resource.facility;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -24,36 +21,17 @@ import com.melip.webservices.constants.MessageConstants;
 import com.melip.webservices.dto.AttrGrpSearchConditionDto;
 import com.melip.webservices.dto.FacilitySearchConditionDto;
 import com.melip.webservices.resource.common.AbstractResource;
-import com.melip.webservices.resource.common.ResourceException;
 import com.melip.webservices.service.common.QueryCondition;
 import com.melip.webservices.service.facility.IFacilityService;
 import com.melip.webservices.system.MelipRuntimeException;
 import com.melip.webservices.system.MessageProvider;
 
 /**
- * 複数の施設情報を取得するクラスです。
+ * 施設情報を検索するクラスです。
  */
-@Path("/facilityList")
-public class FacilityListResource extends AbstractResource {
+public class SearchFacilities extends AbstractResource {
 
-  private static final Logger log = LoggerFactory.getLogger(FacilityListResource.class);
-
-  /** パラメータ 地域ID */
-  private static final String PARAM_REGION_ID = "regionId";
-  /** パラメータ 検索条件 */
-  private static final String PARAM_CONDITION = "condition";
-  /** パラメータ 開始位置 */
-  private static final String PARAM_INDEX = "index";
-  /** パラメータ 件数 */
-  private static final String PARAM_COUNT = "count";
-  /** パラメータ ソートキー */
-  private static final String PARAM_ORDER = "order";
-  /** パラメータ 緯度 */
-  private static final String PARAM_LATITUDE = "lat";
-  /** パラメータ 経度 */
-  private static final String PARAM_LONGITUDE = "lon";
-  /** パラメータ 半径 */
-  private static final String PARAM_RADIUS = "r";
+  private static final Logger log = LoggerFactory.getLogger(SearchFacilities.class);
 
   /** デフォルトの半径（km） */
   private static final Float RADIUS_DEFAULT = 0.5F;
@@ -68,15 +46,14 @@ public class FacilityListResource extends AbstractResource {
    * @param index 開始位置
    * @param count 件数
    * @param order ソートキー
+   * @param latitude 緯度
+   * @param longitude 経度
+   * @param radius 半径
    * @return 施設情報を保持したリソースマルチDTO、もしくはリソースエラーDTO
    */
-  @GET
-  public Response getFacilityList(@QueryParam(PARAM_LANG_DIV) String langDiv,
-      @QueryParam(PARAM_ATTR_GRP_ALIAS) String attrGrpAlias,
-      @QueryParam(PARAM_REGION_ID) String regionId, @QueryParam(PARAM_CONDITION) String condition,
-      @QueryParam(PARAM_INDEX) String index, @QueryParam(PARAM_COUNT) String count,
-      @QueryParam(PARAM_ORDER) String order, @QueryParam(PARAM_LATITUDE) String latitude,
-      @QueryParam(PARAM_LONGITUDE) String longitude, @QueryParam(PARAM_RADIUS) String radius) {
+  public Response searchFacilities(String langDiv, String attrGrpAlias, String regionId,
+      String condition, String index, String count, String order, String latitude,
+      String longitude, String radius) {
 
     int status = HttpServletResponse.SC_OK;
     AbstractResourceDto resourceDto = null;
@@ -132,11 +109,10 @@ public class FacilityListResource extends AbstractResource {
    * @param longitude 経度
    * @param radius 半径
    * @return エラーメッセージリスト
-   * @throws ResourceException
    */
   private List<String> checkParameters(String langDiv, String attrGrpAlias, String regionId,
       String condition, String index, String count, String order, String latitude,
-      String longitude, String radius) throws ResourceException {
+      String longitude, String radius) {
 
     if (log.isDebugEnabled()) {
       log.debug("【パラメータ情報】");
@@ -234,7 +210,7 @@ public class FacilityListResource extends AbstractResource {
     if (StringUtils.isNotEmpty(latitude) && StringUtils.isNotEmpty(longitude)) {
       facilityConditionDto.setlatitude(Float.valueOf(latitude));
       facilityConditionDto.setlongitude(Float.valueOf(longitude));
-      if (StringUtils.isNotEmpty(radius)) {
+      if (StringUtils.isEmpty(radius)) {
         facilityConditionDto.setradius(RADIUS_DEFAULT);
       } else {
         facilityConditionDto.setradius(Float.valueOf(radius));

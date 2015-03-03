@@ -25,6 +25,22 @@ public abstract class AbstractResource implements IResource {
   protected static final String PARAM_LANG_DIV = "langDiv";
   /** パラメータ 属性グループエイリアス */
   protected static final String PARAM_ATTR_GRP_ALIAS = "attrGrpAlias";
+  /** パラメータ 地域ID */
+  protected static final String PARAM_REGION_ID = "regionId";
+  /** パラメータ 検索条件 */
+  protected static final String PARAM_CONDITION = "condition";
+  /** パラメータ 開始位置 */
+  protected static final String PARAM_INDEX = "index";
+  /** パラメータ 件数 */
+  protected static final String PARAM_COUNT = "count";
+  /** パラメータ ソートキー */
+  protected static final String PARAM_ORDER = "order";
+  /** パラメータ 緯度 */
+  protected static final String PARAM_LATITUDE = "lat";
+  /** パラメータ 経度 */
+  protected static final String PARAM_LONGITUDE = "lon";
+  /** パラメータ 半径 */
+  protected static final String PARAM_RADIUS = "r";
 
   /** 項目のセパレータ */
   protected static final String SEPARATOR_ITEM = ",";

@@ -46,7 +46,7 @@
 
   <servlet-mapping>
     <servlet-name>Jersey Servlet</servlet-name>
-    <url-pattern>/resource/*</url-pattern>
+    <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
 
 </web-app>
