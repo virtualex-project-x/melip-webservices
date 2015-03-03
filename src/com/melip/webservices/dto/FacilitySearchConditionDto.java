@@ -40,7 +40,7 @@ public class FacilitySearchConditionDto extends AbstractDto {
   /** 経度 */
   private Float longitude;
   /** 半径 */
-  private Float radius;
+  private Integer radius;
 
   /**
    * 取得対象属性グループエイリアスリストを取得します。
@@ -156,7 +156,7 @@ public class FacilitySearchConditionDto extends AbstractDto {
    * 
    * @return 半径
    */
-  public Float getradius() {
+  public Integer getradius() {
     return radius;
   }
 
@@ -165,7 +165,7 @@ public class FacilitySearchConditionDto extends AbstractDto {
    * 
    * @param radius 半径
    */
-  public void setradius(Float radius) {
+  public void setradius(Integer radius) {
     this.radius = radius;
   }
 

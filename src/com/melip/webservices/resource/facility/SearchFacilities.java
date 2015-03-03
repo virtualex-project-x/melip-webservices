@@ -33,8 +33,8 @@ public class SearchFacilities extends AbstractResource {
 
   private static final Logger log = LoggerFactory.getLogger(SearchFacilities.class);
 
-  /** デフォルトの半径（km） */
-  private static final Float RADIUS_DEFAULT = 0.5F;
+  /** デフォルトの半径（m） */
+  private static final Integer RADIUS_DEFAULT = 500;
 
   /**
    * 複数の施設情報をJSON形式で取得します。
@@ -158,7 +158,7 @@ public class SearchFacilities extends AbstractResource {
     // 経度の範囲チェック
     checkRange(errMsgList, PARAM_LONGITUDE, longitude, -180, 180);
     // 半径の数値チェック
-    checkDecimal(errMsgList, PARAM_RADIUS, radius);
+    checkInteger(errMsgList, PARAM_RADIUS, radius);
     // 半径の範囲チェック
     checkRange(errMsgList, PARAM_RADIUS, radius, 0, null);
 
@@ -213,7 +213,7 @@ public class SearchFacilities extends AbstractResource {
       if (StringUtils.isEmpty(radius)) {
         facilityConditionDto.setradius(RADIUS_DEFAULT);
       } else {
-        facilityConditionDto.setradius(Float.valueOf(radius));
+        facilityConditionDto.setradius(Integer.valueOf(radius));
       }
     }
 

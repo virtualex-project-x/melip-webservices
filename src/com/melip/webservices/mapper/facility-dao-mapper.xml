@@ -9,6 +9,7 @@
     <id property="facilityId" column="facilityId" />
     <result property="latitude" column="latitude" />
     <result property="longitude" column="longitude" />
+    <result property="distance" column="distance" />
     <collection property="attrDtoList" ofType="com.melip.common.dto.common.AttrDto">
       <id property="attrGrpId" column="attrGrpId" />
       <result property="attrGrpAlias" column="attrGrpAlias" />
@@ -43,6 +44,7 @@
         a.FACILITY_ID          as facilityId
       , a.LATITUDE             as latitude
       , a.LONGITUDE            as longitude
+      , a.DISTANCE             as distance
       , a.FACILITY_ATTR_GRP_ID as attrGrpId
       , a.ALIAS                as attrGrpAlias
       , a.TYPE                 as attrGrpType
@@ -63,6 +65,13 @@
             f1.FACILITY_ID
           , f1.LATITUDE
           , f1.LONGITUDE
+          , (
+              6371 * ACOS(
+                COS(RADIANS(#{p.latitude})) * COS(RADIANS(f1.LATITUDE)) * COS(RADIANS(f1.LONGITUDE) - RADIANS(#{p.longitude}))
+                +
+                SIN(RADIANS(#{p.latitude})) * SIN(RADIANS(f1.LATITUDE))
+              )
+            ) * 1000 as DISTANCE
           , fag.FACILITY_ATTR_GRP_ID
           , fag.ALIAS
           , fag.TYPE
@@ -126,15 +135,9 @@
               </if>
             )
           </if>
-          <if test="p.latitude != null and p.longitude != null and p.radius != null">
-            and (
-              6371 * ACOS(
-                COS(RADIANS(#{p.latitude})) * COS(RADIANS(f1.LATITUDE)) * COS(RADIANS(f1.LONGITUDE) - RADIANS(#{p.longitude}))
-                +
-                SIN(RADIANS(#{p.latitude})) * SIN(RADIANS(f1.LATITUDE))
-              )
-            ) &lt;= #{p.radius}
-          </if>
+        <if test="p.latitude != null and p.longitude != null and p.radius != null">
+          having DISTANCE &lt;= #{p.radius}
+        </if>
       ) a 
       left outer join v_cd cd 
         on a.CD_GRP_ID = cd.CD_GRP_ID 
