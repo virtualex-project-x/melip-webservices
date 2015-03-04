@@ -34,7 +34,7 @@ public class SearchFacilities extends AbstractResource {
   private static final Logger log = LoggerFactory.getLogger(SearchFacilities.class);
 
   /** デフォルトの半径（m） */
-  private static final Integer RADIUS_DEFAULT = 500;
+  private static final Integer RADIUS_DEFAULT = Integer.MAX_VALUE;
 
   /**
    * 複数の施設情報をJSON形式で取得します。
