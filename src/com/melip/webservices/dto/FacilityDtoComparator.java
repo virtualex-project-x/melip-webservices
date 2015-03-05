@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.melip.webservices.dto;
 
 import java.util.Comparator;
@@ -62,19 +59,11 @@ public class FacilityDtoComparator implements Comparator<FacilityDto> {
     }
     // 左がnull
     else if (StringUtils.isEmpty(val1) && StringUtils.isNotEmpty(val2)) {
-      if (nullFirst) {
-        returnVal = -1;
-      } else {
-        returnVal = 1;
-      }
+      returnVal = nullFirst ? -1 : 1;
     }
     // 右がnull
     else if (StringUtils.isNotEmpty(val1) && StringUtils.isEmpty(val2)) {
-      if (nullFirst) {
-        returnVal = 1;
-      } else {
-        returnVal = -1;
-      }
+      returnVal = nullFirst ? 1 : -1;
     }
     // 両方nullでない
     else {
