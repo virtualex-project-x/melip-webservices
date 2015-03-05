@@ -36,10 +36,8 @@
     </foreach>
   </sql>
   
-  <!-- 施設情報取得 -->
-  <select id="selectFacility" resultMap="facilityDtoResultMap" parameterType="CONDITION"
-    useCache="false">
-
+  <!-- 施設DTO取得 -->
+  <select id="getFacilityDto" resultMap="facilityDtoResultMap" parameterType="CONDITION">
     select
         a.FACILITY_ID          as facilityId
       , a.LATITUDE             as latitude
@@ -153,7 +151,73 @@
     order by
       facilityId
       , attrGrpId
-
   </select>
+
+  <!-- 共通項目更新 -->
+  <sql id="commonPropertyUpdate">
+    UPDATE_DATETIME = now(),
+    <if test="p.updateUser != null">UPDATE_USER = #{p.updateUser},</if>
+    <if test="p.sts != null">STS = #{p.sts},</if>
+  </sql>
+
+  <!-- 施設更新 -->
+  <update id="updateFacility" parameterType="CONDITION">
+    update m_facility
+    <set>
+      <include refid="commonPropertyUpdate"/>
+      <if test="p.publishSts != null">PUBLISH_STS = #{p.publishSts},</if>
+      <if test="p.latitude != null">LATITUDE = #{p.latitude},</if>
+      <if test="p.longitude != null">LONGITUDE = #{p.longitude},</if>
+    </set>
+    where
+      FACILITY_ID = #{p.facilityId}
+  </update>
+
+  <!-- 子施設一括更新（親施設ID指定による複数件同時更新） -->
+  <update id="updateChildFacilityByParentFacilityId" parameterType="CONDITION">
+    update m_facility
+    <set>
+      <include refid="commonPropertyUpdate"/>
+      <if test="p.publishSts != null">PUBLISH_STS = #{p.publishSts},</if>
+      <if test="p.latitude != null">LATITUDE = #{p.latitude},</if>
+      <if test="p.longitude != null">LONGITUDE = #{p.longitude},</if>
+    </set>
+    where
+      PARENT_FACILITY_ID = #{v.parentFacilityId}
+  </update>
+
+  <!-- 施設属性値一括更新（施設ID指定による複数件同時更新） -->
+  <update id="updateFacilityAttrValByFacilityId" parameterType="CONDITION">
+    update m_facility_attr_val
+    <set>
+      <include refid="commonPropertyUpdate"/>
+    </set>
+    where
+      FACILITY_ID = #{v.facilityId}
+  </update>
+
+  <!-- 施設属性値_多言語一括更新（施設ID指定による複数件同時更新） -->
+  <update id="updateFacilityAttrValLangByFacilityId" parameterType="CONDITION">
+    update m_facility_attr_val_lang favl
+    <set>
+      <include refid="commonPropertyUpdate"/>
+      <if test="p.val != null">VAL = #{p.val}</if>
+    </set>
+    where
+      exists ( 
+        select
+            * 
+        from
+          m_facility_attr_val fav 
+        where
+          fav.FACILITY_ID = #{v.facilityId} 
+          and favl.FACILITY_ATTR_VAL_ID = fav.FACILITY_ATTR_VAL_ID
+      )
+      <if test="v.langDiv != null">
+        and LANG_DIV = #{v.langDiv}
+      </if>
+      
+  </update>
+
 
 </mapper>

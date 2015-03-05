@@ -23,7 +23,14 @@
   <!-- 施設サービス -->
   <bean id="facilityService" class="com.melip.webservices.service.facility.FacilityService"
     scope="prototype" lazy-init="true" parent="abstractDataService">
-    <property name="selectFacilitySqlId" value="com.melip.webservices.mapper.Facility.selectFacility" />
+    <property name="getFacilityDtoSqlId" value="com.melip.webservices.mapper.Facility.getFacilityDto" />
+    <property name="updateFacility" value="com.melip.webservices.mapper.Facility.updateFacility" />
+    <property name="updateChildFacilityByParentFacilityId"
+      value="com.melip.webservices.mapper.Facility.updateChildFacilityByParentFacilityId" />
+    <property name="updateFacilityAttrValByFacilityId"
+      value="com.melip.webservices.mapper.Facility.updateFacilityAttrValByFacilityId" />
+    <property name="updateFacilityAttrValLangByFacilityId"
+      value="com.melip.webservices.mapper.Facility.updateFacilityAttrValLangByFacilityId" />
   </bean>
 
 </beans>

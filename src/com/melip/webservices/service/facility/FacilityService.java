@@ -7,9 +7,13 @@ import java.util.Map;
 
 import org.apache.commons.collections.comparators.ComparatorChain;
 
+import com.melip.common.constants.CodeConstants;
 import com.melip.common.dto.common.FacilityDto;
 import com.melip.webservices.common.DtoList;
 import com.melip.webservices.dto.FacilityDtoComparator;
+import com.melip.webservices.entity.Facility;
+import com.melip.webservices.entity.FacilityAttrVal;
+import com.melip.webservices.entity.FacilityAttrValLang;
 import com.melip.webservices.service.common.AbstractDataService;
 import com.melip.webservices.service.common.QueryCondition;
 
@@ -18,8 +22,16 @@ import com.melip.webservices.service.common.QueryCondition;
  */
 public class FacilityService extends AbstractDataService implements IFacilityService {
 
-  /** 施設情報取得SQL_ID */
-  private String selectFacilitySqlId;
+  /** 施設DTO取得SQL_ID */
+  private String getFacilityDtoSqlId;
+  /** 施設更新SQL_ID */
+  private String updateFacility;
+  /** 子施設一括更新SQL_ID */
+  private String updateChildFacilityByParentFacilityId;
+  /** 施設属性値一括更新SQL_ID */
+  private String updateFacilityAttrValByFacilityId;
+  /** 施設属性値_多言語一括更新SQL_ID */
+  private String updateFacilityAttrValLangByFacilityId;
 
   /**
    * @see com.melip.webservices.service.facility.IFacilityService#getFacilityDtoList(java.lang.String)
@@ -48,7 +60,7 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
   @Override
   public DtoList<FacilityDto> getFacilityDtoList(QueryCondition condition) {
 
-    List<FacilityDto> facilityList = selectList(getSelectFacilitySqlId(), condition);
+    List<FacilityDto> facilityList = selectList(getGetFacilityDtoSqlId(), condition);
     Integer allCount = facilityList.size();
 
     // ソート
@@ -129,25 +141,177 @@ public class FacilityService extends AbstractDataService implements IFacilitySer
    */
   @Override
   public FacilityDto getFacilityDto(QueryCondition condition) {
-    return selectOne(getSelectFacilitySqlId(), condition);
+    return selectOne(getGetFacilityDtoSqlId(), condition);
   }
 
   /**
-   * 施設情報取得SQL_IDを取得します。
+   * @see com.melip.webservices.service.facility.IFacilityService#updateFacility(com.melip.webservices.entity.Facility)
+   */
+  @Override
+  public int updateFacility(Facility facility) {
+
+    QueryCondition condition = new QueryCondition();
+    condition.setParam(facility);
+    return update(getUpdateFacility(), condition);
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#updateChildFacilityByParentFacilityId(java.lang.Integer,
+   *      com.melip.webservices.entity.Facility)
+   */
+  @Override
+  public int updateChildFacilityByParentFacilityId(Integer parentFacilityId, Facility facility) {
+
+    QueryCondition condition = new QueryCondition();
+    condition.setValue(Facility.FIELD_PARENT_FACILITY_ID, parentFacilityId);
+    condition.setParam(facility);
+    return update(getUpdateChildFacilityByParentFacilityId(), condition);
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#updateFacilityAttrValByFacilityId(java.lang.Integer,
+   *      com.melip.webservices.entity.FacilityAttrVal)
+   */
+  @Override
+  public int updateFacilityAttrValByFacilityId(Integer facilityId, FacilityAttrVal facilityAttrVal) {
+
+    QueryCondition condition = new QueryCondition();
+    condition.setValue(FacilityAttrVal.FIELD_FACILITY_ID, facilityId);
+    condition.setParam(facilityAttrVal);
+    return update(getUpdateFacilityAttrValByFacilityId(), condition);
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#updateFacilityAttrValLangByFacilityId(java.lang.Integer,
+   *      java.lang.String, com.melip.webservices.entity.FacilityAttrValLang)
+   */
+  @Override
+  public int updateFacilityAttrValLangByFacilityId(Integer facilityId, String langDiv,
+      FacilityAttrValLang facilityAttrValLang) {
+
+    QueryCondition condition = new QueryCondition();
+    condition.setValue(FacilityAttrVal.FIELD_FACILITY_ID, facilityId);
+    condition.setValue(FacilityAttrValLang.FIELD_LANG_DIV, langDiv);
+    condition.setParam(facilityAttrValLang);
+    return update(getUpdateFacilityAttrValLangByFacilityId(), condition);
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#logicalDeleteFacility(java.lang.Integer)
+   */
+  @Override
+  public void logicalDeleteFacility(Integer facilityId) {
+
+    // TODO:トランザクション制御
+
+    // TODO:施設_施設グループ_リンク属性値_多言語
+    // TODO:施設_施設グループ_リンク属性値
+    // TODO:施設_施設グループ_リンク
+    // 施設属性値_多言語
+    FacilityAttrValLang favl = new FacilityAttrValLang();
+    favl.setSts(CodeConstants.CODE_STS_DELETED);
+    updateFacilityAttrValLangByFacilityId(facilityId, null, favl);
+    // 施設属性値
+    FacilityAttrVal fav = new FacilityAttrVal();
+    fav.setSts(CodeConstants.CODE_STS_DELETED);
+    updateFacilityAttrValByFacilityId(facilityId, fav);
+    // 子施設
+    Facility f = new Facility();
+    f.setSts(CodeConstants.CODE_STS_DELETED);
+    updateChildFacilityByParentFacilityId(facilityId, f);
+    // 施設
+    f.setFacilityId(facilityId);
+    updateFacility(f);
+  }
+
+  /**
+   * 施設DTO取得SQL_IDを取得します。
    * 
    * @return 施設情報取得SQL_ID
    */
-  public String getSelectFacilitySqlId() {
-    return selectFacilitySqlId;
+  public String getGetFacilityDtoSqlId() {
+    return getFacilityDtoSqlId;
   }
 
   /**
-   * 施設情報取得SQL_IDを設定します。
+   * 施設DTO取得SQL_IDを設定します。
    * 
-   * @param selectFacilitySqlId 施設情報取得SQL_ID
+   * @param getFacilityDtoSqlId 施設情報取得SQL_ID
    */
-  public void setSelectFacilitySqlId(String selectFacilitySqlId) {
-    this.selectFacilitySqlId = selectFacilitySqlId;
+  public void setGetFacilityDtoSqlId(String getFacilityDtoSqlId) {
+    this.getFacilityDtoSqlId = getFacilityDtoSqlId;
+  }
+
+  /**
+   * 施設更新SQL_IDを取得します。
+   * 
+   * @return 施設更新SQL_ID
+   */
+  public String getUpdateFacility() {
+    return updateFacility;
+  }
+
+  /**
+   * 施設更新SQL_IDを設定します。
+   * 
+   * @param updateFacility 施設更新SQL_ID
+   */
+  public void setUpdateFacility(String updateFacility) {
+    this.updateFacility = updateFacility;
+  }
+
+  /**
+   * 子施設一括更新SQL_IDを取得します。
+   * 
+   * @return 子施設一括更新SQL_ID
+   */
+  public String getUpdateChildFacilityByParentFacilityId() {
+    return updateChildFacilityByParentFacilityId;
+  }
+
+  /**
+   * 子施設一括更新SQL_IDを設定します。
+   * 
+   * @param updateChildFacilityByParentFacilityId 子施設一括更新SQL_ID
+   */
+  public void setUpdateChildFacilityByParentFacilityId(String updateChildFacilityByParentFacilityId) {
+    this.updateChildFacilityByParentFacilityId = updateChildFacilityByParentFacilityId;
+  }
+
+  /**
+   * 施設属性値一括更新SQL_IDを取得します。
+   * 
+   * @return 施設属性値一括更新SQL_ID
+   */
+  public String getUpdateFacilityAttrValByFacilityId() {
+    return updateFacilityAttrValByFacilityId;
+  }
+
+  /**
+   * 施設属性値一括更新SQL_IDを設定します。
+   * 
+   * @param updateFacilityAttrValByFacilityId 施設属性値一括更新SQL_ID
+   */
+  public void setUpdateFacilityAttrValByFacilityId(String updateFacilityAttrValByFacilityId) {
+    this.updateFacilityAttrValByFacilityId = updateFacilityAttrValByFacilityId;
+  }
+
+  /**
+   * 施設属性値_多言語一括更新SQL_IDを取得します。
+   * 
+   * @return 施設属性値_多言語一括更新SQL_ID
+   */
+  public String getUpdateFacilityAttrValLangByFacilityId() {
+    return updateFacilityAttrValLangByFacilityId;
+  }
+
+  /**
+   * 施設属性値_多言語一括更新SQL_IDを設定します。
+   * 
+   * @param updateFacilityAttrValLangByFacilityId 施設属性値_多言語一括更新SQL_ID
+   */
+  public void setUpdateFacilityAttrValLangByFacilityId(String updateFacilityAttrValLangByFacilityId) {
+    this.updateFacilityAttrValLangByFacilityId = updateFacilityAttrValLangByFacilityId;
   }
 
 }

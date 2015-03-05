@@ -89,14 +89,14 @@ public class ResourceFacilities extends AbstractResource {
   /**
    * 施設情報を削除します。
    * 
-   * @param id
+   * @param facilityId
    * @return
    */
   @Path("{id}")
   @DELETE
-  public Response deleteFacility(@PathParam("id") int id) {
+  public Response deleteFacility(@PathParam("id") int facilityId) {
     // TODO:戻りはvoid？
-    return null;
+    return new DeleteFacility().deleteFacility(facilityId);
   }
 
 }
