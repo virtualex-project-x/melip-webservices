@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <!-- 施設サービス用 -->
-<mapper namespace="com.melip.webservices.mapper.Facility">
+<mapper namespace="com.melip.webservices.mapper.FacilityMapper">
 
   <!-- 施設DTO用resultMap -->
   <resultMap id="facilityDtoResultMap" type="com.melip.common.dto.common.FacilityDto">

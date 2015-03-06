@@ -12,25 +12,8 @@
   <bean id="systemInitializeService" class="com.melip.webservices.service.initialize.SystemInitializeService"
     scope="prototype" lazy-init="true" />
 
-  <!-- 基底データサービス -->
-  <bean id="abstractDataService" class="com.melip.webservices.service.common.AbstractDataService"
-    scope="prototype" lazy-init="true">
-    <property name="dao" ref="dao" />
-  </bean>
-
-  <!-- #################### 通常サービス #################### -->
-
   <!-- 施設サービス -->
   <bean id="facilityService" class="com.melip.webservices.service.facility.FacilityService"
-    scope="prototype" lazy-init="true" parent="abstractDataService">
-    <property name="getFacilityDtoSqlId" value="com.melip.webservices.mapper.Facility.getFacilityDto" />
-    <property name="updateFacility" value="com.melip.webservices.mapper.Facility.updateFacility" />
-    <property name="updateChildFacilityByParentFacilityId"
-      value="com.melip.webservices.mapper.Facility.updateChildFacilityByParentFacilityId" />
-    <property name="updateFacilityAttrValByFacilityId"
-      value="com.melip.webservices.mapper.Facility.updateFacilityAttrValByFacilityId" />
-    <property name="updateFacilityAttrValLangByFacilityId"
-      value="com.melip.webservices.mapper.Facility.updateFacilityAttrValLangByFacilityId" />
-  </bean>
+    scope="prototype" lazy-init="true"/>
 
 </beans>
