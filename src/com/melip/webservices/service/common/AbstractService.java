@@ -1,6 +1,5 @@
 package com.melip.webservices.service.common;
 
-
 /**
  * サービスの基底クラスです。<br>
  * すべてのサービスはこのクラスを継承して作成します。
