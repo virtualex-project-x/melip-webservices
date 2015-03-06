@@ -4,7 +4,7 @@ import com.melip.webservices.constants.MessageConstants;
 import com.melip.webservices.system.MelipException;
 
 /**
- * サービスの業務例外クラスです。
+ * リソースの業務例外クラスです。
  */
 public class ResourceException extends MelipException {
 
