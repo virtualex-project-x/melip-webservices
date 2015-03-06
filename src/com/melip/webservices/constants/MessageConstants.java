@@ -20,13 +20,13 @@ public class MessageConstants {
   public static final String CMN_0003 = "CMN-0003";
   /** ${0} は ${1} 以下にしてください。入力値 [${2}] {@value} */
   public static final String CMN_0004 = "CMN-0004";
-  /** ${0} は整数を入力してください。入力値 [${1}] */
+  /** ${0} は整数を入力してください。入力値 [${1}] {@value} */
   public static final String CMN_0005 = "CMN-0005";
   /** ${0} の値が不正です。入力値 [${1}] {@value} */
   public static final String CMN_0006 = "CMN-0006";
   /** ${0} は ${1} の形式で入力してください。入力値 [${2}] {@value} */
   public static final String CMN_0007 = "CMN-0007";
-  /** ${0} は数値を入力してください。入力値 [${1}] */
+  /** ${0} は数値を入力してください。入力値 [${1}] {@value} */
   public static final String CMN_0008 = "CMN-0008";
 
   // システム
