@@ -4,65 +4,89 @@
 <!-- 施設サービス用 -->
 <mapper namespace="com.melip.webservices.mapper.FacilityMapper">
 
+  <!-- ##### 取得 ########################################################################################## -->
+
   <!-- 施設DTO用resultMap -->
   <resultMap id="facilityDtoResultMap" type="com.melip.common.dto.common.FacilityDto">
     <id property="facilityId" column="facilityId" />
+    <result property="regionId" column="regionId" />
+    <result property="publishSts" column="publishSts" />
     <result property="latitude" column="latitude" />
     <result property="longitude" column="longitude" />
+    <result property="parentFacilityId" column="parentFacilityId" />
     <result property="distance" column="distance" />
     <collection property="attrDtoList" ofType="com.melip.common.dto.common.AttrDto">
-      <id property="attrGrpId" column="attrGrpId" />
+      <id property="attrValLangId" column="attrValLangId" />
+      <result property="attrGrpId" column="attrGrpId" />
       <result property="attrGrpAlias" column="attrGrpAlias" />
       <result property="attrGrpType" column="attrGrpType" />
       <result property="attrGrpNm" column="attrGrpNm" />
+      <result property="attrLangDiv" column="attrLangDiv" />
       <result property="attrVal" column="attrVal" />
       <result property="attrCdVal" column="attrCdVal" />
     </collection>
   </resultMap>
 
-  <!-- ステータスの条件 -->
-  <sql id="stsCondition">
+  <!-- 取得共通_ステータスの条件 -->
+  <sql id="selectCommonStsCondition">
     in
     <foreach collection="stsArray" item="item" open="(" separator="," close=")">
       #{item}
     </foreach>
   </sql>
 
-  <!-- 言語区分の条件 -->
-  <sql id="langDivCondition">
+  <!-- 取得共通_言語区分の条件 -->
+  <sql id="selectCommonLangDivCondition">
     in
     <foreach collection="langDivArray" item="item" open="(" separator="," close=")">
       #{item}
     </foreach>
   </sql>
   
+  <!-- 取得共通_カラム -->
+  <sql id="selectCommonColumn">
+      CREATE_DATETIME      as createDatetime
+    , CREATE_USER          as createUser
+    , UPDATE_DATETIME      as updateDatetime
+    , UPDATE_USER          as updateUser
+    , STS                  as sts
+  </sql>
+  
   <!-- 施設DTO取得 -->
-  <select id="getFacilityDto" resultMap="facilityDtoResultMap" parameterType="CONDITION">
+  <select id="getFacilityDtoList" resultMap="facilityDtoResultMap" parameterType="CONDITION">
     select
-        a.FACILITY_ID          as facilityId
-      , a.LATITUDE             as latitude
-      , a.LONGITUDE            as longitude
-      , a.DISTANCE             as distance
-      , a.FACILITY_ATTR_GRP_ID as attrGrpId
-      , a.ALIAS                as attrGrpAlias
-      , a.TYPE                 as attrGrpType
-      , a.NM                   as attrGrpNm
+        a.FACILITY_ID               as facilityId
+      , a.REGION_ID                 as regionId
+      , a.PUBLISH_STS               as publishSts
+      , a.LATITUDE                  as latitude
+      , a.LONGITUDE                 as longitude
+      , a.PARENT_FACILITY_ID        as parentFacilityId
+      , a.DISTANCE                  as distance
+      , a.FACILITY_ATTR_GRP_ID      as attrGrpId
+      , a.ALIAS                     as attrGrpAlias
+      , a.TYPE                      as attrGrpType
+      , a.NM                        as attrGrpNm
+      , a.FACILITY_ATTR_VAL_LANG_ID as attrValLangId
+      , a.LANG_DIV                  as attrLangDiv
       , case 
         when cd.CD_NM is null 
         then a.val 
         else cd.CD_NM 
-        end                    as attrVal
+        end                         as attrVal
       , case 
         when cd.cd_nm is null 
         then null 
         else a.VAL 
-        end                    as attrCdVal 
+        end                         as attrCdVal 
     from
       ( 
         select
             f1.FACILITY_ID
+          , f1.REGION_ID
+          , f1.PUBLISH_STS
           , f1.LATITUDE
           , f1.LONGITUDE
+          , f1.PARENT_FACILITY_ID
           , (
               6371 * ACOS(
                 COS(RADIANS(#{p.latitude})) * COS(RADIANS(f1.LATITUDE)) * COS(RADIANS(f1.LONGITUDE) - RADIANS(#{p.longitude}))
@@ -70,30 +94,66 @@
                 SIN(RADIANS(#{p.latitude})) * SIN(RADIANS(f1.LATITUDE))
               )
             ) * 1000 as DISTANCE
-          , fag.FACILITY_ATTR_GRP_ID
-          , fag.ALIAS
-          , fag.TYPE
-          , fag.CD_GRP_ID
-          , fagl.NM
-          , favl.VAL 
+          , fag_fagl.FACILITY_ATTR_GRP_ID
+          , fag_fagl.ALIAS
+          , fag_fagl.TYPE
+          , fag_fagl.CD_GRP_ID
+          , fag_fagl.NM
+          , fav_favl.FACILITY_ATTR_VAL_LANG_ID
+          , fav_favl.LANG_DIV
+          , fav_favl.VAL 
         from
           m_facility f1 
-          inner join m_facility_attr_val fav 
-            on f1.FACILITY_ID = fav.FACILITY_ID 
-            and fav.STS <include refid="stsCondition"/>
-          inner join m_facility_attr_val_lang favl 
-            on fav.FACILITY_ATTR_VAL_ID = favl.FACILITY_ATTR_VAL_ID 
-            and favl.STS <include refid="stsCondition"/>
-            and favl.LANG_DIV <include refid="langDivCondition"/>
-          inner join m_facility_attr_grp fag 
-            on fav.FACILITY_ATTR_GRP_ID = fag.FACILITY_ATTR_GRP_ID 
-            and fag.STS <include refid="stsCondition"/>
-          inner join m_facility_attr_grp_lang fagl 
-            on fag.FACILITY_ATTR_GRP_ID = fagl.FACILITY_ATTR_GRP_ID 
-            and fagl.STS <include refid="stsCondition"/>
-            and fagl.LANG_DIV <include refid="langDivCondition"/>
+          inner join (
+            select
+                fav.FACILITY_ID
+              , fav.FACILITY_ATTR_GRP_ID
+              , favl.FACILITY_ATTR_VAL_LANG_ID
+              , favl.LANG_DIV
+              , favl.VAL
+            from
+              m_facility_attr_val fav
+              inner join m_facility_attr_val_lang favl
+                on fav.FACILITY_ATTR_VAL_ID = favl.FACILITY_ATTR_VAL_ID
+                and favl.STS <include refid="selectCommonStsCondition"/>
+                <if test="langDivArray != null">
+                  and favl.LANG_DIV <include refid="selectCommonLangDivCondition"/>
+                </if>
+            where
+              fav.STS <include refid="selectCommonStsCondition"/>
+          ) fav_favl
+            on f1.FACILITY_ID = fav_favl.FACILITY_ID
+          left outer join (
+            select
+                fag.FACILITY_ATTR_GRP_ID
+              , fag.ALIAS
+              , fag.TYPE
+              , fag.CD_GRP_ID
+              , fagl.LANG_DIV
+              , fagl.NM
+            from
+              m_facility_attr_grp fag
+              inner join m_facility_attr_grp_lang fagl
+                on fag.FACILITY_ATTR_GRP_ID = fagl.FACILITY_ATTR_GRP_ID
+                and fagl.STS <include refid="selectCommonStsCondition"/>
+                <if test="langDivArray != null">
+                  and fagl.LANG_DIV <include refid="selectCommonLangDivCondition"/>
+                </if>
+            where
+              fag.STS <include refid="selectCommonStsCondition"/>
+          ) fag_fagl
+            on (
+              (
+                fav_favl.FACILITY_ATTR_GRP_ID = fag_fagl.FACILITY_ATTR_GRP_ID
+                and fav_favl.LANG_DIV = fag_fagl.LANG_DIV
+              )
+              or (
+                fav_favl.LANG_DIV = 'common'
+                and fav_favl.FACILITY_ATTR_GRP_ID = fag_fagl.FACILITY_ATTR_GRP_ID
+              )
+            )
         where
-          f1.STS <include refid="stsCondition"/>
+          f1.STS <include refid="selectCommonStsCondition"/>
           <if test="p.regionId != null"> 
             and f1.REGION_ID = #{p.regionId}
           </if> 
@@ -108,14 +168,16 @@
                 m_facility f2 
                 inner join m_facility_attr_val fav 
                   on f2.FACILITY_ID = fav.FACILITY_ID 
-                  and fav.STS <include refid="stsCondition"/>
+                  and fav.STS <include refid="selectCommonStsCondition"/>
                 inner join m_facility_attr_val_lang favl 
                   on fav.FACILITY_ATTR_VAL_ID = favl.FACILITY_ATTR_VAL_ID 
-                  and favl.STS <include refid="stsCondition"/>
-                  and favl.LANG_DIV <include refid="langDivCondition"/>
+                  and favl.STS <include refid="selectCommonStsCondition"/>
+                  <if test="langDivArray != null">
+                    and favl.LANG_DIV <include refid="selectCommonLangDivCondition"/>
+                  </if>
                 inner join m_facility_attr_grp fag 
                   on fav.FACILITY_ATTR_GRP_ID = fag.FACILITY_ATTR_GRP_ID 
-                  and fag.STS <include refid="stsCondition"/>
+                  and fag.STS <include refid="selectCommonStsCondition"/>
               where
                 f1.FACILITY_ID = f2.FACILITY_ID 
                 and ( 
@@ -140,7 +202,9 @@
       left outer join v_cd cd 
         on a.CD_GRP_ID = cd.CD_GRP_ID 
         and a.VAL = cd.CD 
-        and cd.LANG_DIV <include refid="langDivCondition"/>
+        <if test="langDivArray != null">
+          and cd.LANG_DIV <include refid="selectCommonLangDivCondition"/>
+        </if>
     <where>
       <if test="p.targetAttrGrpAliasList != null">
         <foreach collection="p.targetAttrGrpAliasList" item="item" >
@@ -152,9 +216,150 @@
       facilityId
       , attrGrpId
   </select>
+  
+  <!-- 施設取得 -->
+  <select id="getFacility" resultType="com.melip.webservices.entity.Facility" parameterType="CONDITION">
+    select
+        FACILITY_ID        as facilityId
+      , <include refid="selectCommonColumn"/>
+      , REGION_ID          as regionId
+      , PUBLISH_STS        as publishSts
+      , LATITUDE           as latitude
+      , LONGITUDE          as longitude
+      , PARENT_FACILITY_ID as parentFacilityId
+    from
+      m_facility 
+    where
+      STS <include refid="selectCommonStsCondition"/>
+      <if test="v.facilityId != null">
+        and FACILITY_ID = #{v.facilityId}
+      </if>
+  </select>
 
-  <!-- 共通項目更新 -->
-  <sql id="commonPropertyUpdate">
+  <!-- 施設属性値_多言語取得 -->
+  <select id="getFacilityAttrValLang" resultType="com.melip.webservices.entity.FacilityAttrValLang" parameterType="CONDITION">
+    select
+        FACILITY_ATTR_VAL_LANG_ID as facilityAttrValLangId
+      , <include refid="selectCommonColumn"/>
+      , FACILITY_ATTR_VAL_ID      as facilityAttrValId
+      , LANG_DIV                  as langDiv
+      , VAL                       as val
+    from
+      m_facility_attr_val_lang favl 
+    where
+      STS <include refid="selectCommonStsCondition"/>
+      <if test="v.langDiv != null">
+        and LANG_DIV = #{v.langDiv}
+      </if>
+      <if test="v.facilityId != null or v.facilityAttrGrpId != null">
+        and exists (
+          select
+              *
+          from
+            m_facility_attr_val fav 
+          where
+            favl.FACILITY_ATTR_VAL_ID = fav.FACILITY_ATTR_VAL_ID
+            <if test="v.facilityId != null">
+              and fav.FACILITY_ID = #{v.facilityId}
+            </if> 
+            <if test="v.facilityAttrGrpId != null">
+              and fav.FACILITY_ATTR_GRP_ID = #{v.facilityAttrGrpId}
+            </if> 
+        )
+      </if>
+  </select>
+
+  <!-- ##### 登録 ########################################################################################## -->
+
+  <!-- 登録共通_カラム -->
+  <sql id="insertCommonColumn">
+      CREATE_DATETIME
+    , CREATE_USER
+    , UPDATE_DATETIME
+    , UPDATE_USER
+    , STS
+  </sql>
+
+  <!-- 登録共通_値 -->
+  <sql id="insertCommonValue">
+      now()
+    , #{createUser}
+    , now()
+    , #{updateUser}
+    , #{sts}
+  </sql>
+
+  <!-- 登録共通_ID取得 -->
+  <sql id="insertCommonId">
+    select last_insert_id() as value
+  </sql>
+
+  <!-- 施設登録 -->
+  <insert id="insertFacility" parameterType="com.melip.webservices.entity.Facility">
+    insert 
+    into m_facility( 
+      <include refid="insertCommonColumn"/>
+      , REGION_ID
+      , PUBLISH_STS
+      , LATITUDE
+      , LONGITUDE
+      , PARENT_FACILITY_ID
+    ) 
+    values ( 
+      <include refid="insertCommonValue"/>
+      , #{regionId}
+      , #{publishSts}
+      , #{latitude}
+      , #{longitude}
+      , #{parentFacilityId}
+    ) 
+    <selectKey keyProperty="facilityId" resultType="int" order="AFTER">
+      <include refid="insertCommonId"/>
+    </selectKey>
+  </insert>
+
+  <!-- 施設属性値登録 -->
+  <insert id="insertFacilityAttrVal" parameterType="com.melip.webservices.entity.FacilityAttrVal">
+    insert 
+    into m_facility_attr_val( 
+      <include refid="insertCommonColumn"/>
+      , FACILITY_ID
+      , FACILITY_ATTR_GRP_ID
+    ) 
+    values ( 
+      <include refid="insertCommonValue"/>
+      , #{facilityId}
+      , #{facilityAttrGrpId}
+    ) 
+    <selectKey keyProperty="facilityAttrValId" resultType="int" order="AFTER">
+      <include refid="insertCommonId"/>
+    </selectKey>
+  </insert>
+
+  <!-- 施設属性値_多言語登録 -->
+  <insert id="insertFacilityAttrValLang" parameterType="com.melip.webservices.entity.FacilityAttrValLang">
+    insert 
+    into m_facility_attr_val_lang( 
+      <include refid="insertCommonColumn"/>
+      , FACILITY_ATTR_VAL_ID
+      , LANG_DIV
+      , VAL
+    ) 
+    values ( 
+      <include refid="insertCommonValue"/>
+      , #{facilityAttrValId}
+      , #{langDiv}
+      , #{val}
+    ) 
+    <selectKey keyProperty="facilityAttrValLangId" resultType="int" order="AFTER">
+      <include refid="insertCommonId"/>
+    </selectKey>
+  </insert>
+
+  <!-- ##### 更新 ########################################################################################## -->
+
+  <!-- 更新共通 -->
+  <sql id="updateCommon">
     UPDATE_DATETIME = now(),
     <if test="p.updateUser != null">UPDATE_USER = #{p.updateUser},</if>
     <if test="p.sts != null">STS = #{p.sts},</if>
@@ -164,23 +369,49 @@
   <update id="updateFacility" parameterType="CONDITION">
     update m_facility
     <set>
-      <include refid="commonPropertyUpdate"/>
+      <include refid="updateCommon"/>
+      <if test="p.regionId != null">REGION_ID = #{p.regionId},</if>
       <if test="p.publishSts != null">PUBLISH_STS = #{p.publishSts},</if>
       <if test="p.latitude != null">LATITUDE = #{p.latitude},</if>
       <if test="p.longitude != null">LONGITUDE = #{p.longitude},</if>
+      <if test="p.parentFacilityId != null">PARENT_FACILITY_ID = #{p.parentFacilityId},</if>
     </set>
     where
       FACILITY_ID = #{p.facilityId}
+  </update>
+
+  <!-- 施設属性値更新 -->
+  <update id="updateFacilityAttrVal" parameterType="CONDITION">
+    update m_facility_attr_val
+    <set>
+      <include refid="updateCommon"/>
+    </set>
+    where
+      FACILITY_ATTR_VAL_ID = #{p.facilityAttrValId}
+  </update>
+
+  <!-- 施設属性値_多言語更新 -->
+  <update id="updateFacilityAttrValLang" parameterType="CONDITION">
+    update m_facility_attr_val_lang
+    <set>
+      <include refid="updateCommon"/>
+      <if test="p.val != null">VAL = #{p.val},</if>
+    </set>
+    where
+      FACILITY_ATTR_VAL_LANG_ID = #{p.facilityAttrValLangId}
+      and LANG_DIV = #{p.langDiv}
   </update>
 
   <!-- 子施設一括更新（親施設ID指定による複数件同時更新） -->
   <update id="updateChildFacilityByParentFacilityId" parameterType="CONDITION">
     update m_facility
     <set>
-      <include refid="commonPropertyUpdate"/>
+      <include refid="updateCommon"/>
+      <if test="p.regionId != null">REGION_ID = #{p.regionId},</if>
       <if test="p.publishSts != null">PUBLISH_STS = #{p.publishSts},</if>
       <if test="p.latitude != null">LATITUDE = #{p.latitude},</if>
       <if test="p.longitude != null">LONGITUDE = #{p.longitude},</if>
+      <if test="p.parentFacilityId != null">PARENT_FACILITY_ID = #{p.parentFacilityId},</if>
     </set>
     where
       PARENT_FACILITY_ID = #{v.parentFacilityId}
@@ -190,7 +421,7 @@
   <update id="updateFacilityAttrValByFacilityId" parameterType="CONDITION">
     update m_facility_attr_val
     <set>
-      <include refid="commonPropertyUpdate"/>
+      <include refid="updateCommon"/>
     </set>
     where
       FACILITY_ID = #{v.facilityId}
@@ -200,7 +431,7 @@
   <update id="updateFacilityAttrValLangByFacilityId" parameterType="CONDITION">
     update m_facility_attr_val_lang favl
     <set>
-      <include refid="commonPropertyUpdate"/>
+      <include refid="updateCommon"/>
       <if test="p.val != null">VAL = #{p.val}</if>
     </set>
     where
@@ -216,8 +447,6 @@
       <if test="v.langDiv != null">
         and LANG_DIV = #{v.langDiv}
       </if>
-      
   </update>
-
 
 </mapper>

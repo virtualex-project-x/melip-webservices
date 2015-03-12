@@ -1,5 +1,8 @@
 package com.melip.webservices.resource.facility;
 
+import java.util.List;
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -9,6 +12,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.melip.common.constants.CommonConstants;
+import com.melip.common.dto.common.FacilityStoreDto;
 import com.melip.webservices.resource.common.AbstractResource;
 
 /**
@@ -64,38 +69,38 @@ public class ResourceFacilities extends AbstractResource {
   /**
    * 施設情報を新規作成します。
    * 
-   * @return
+   * @param facilityStoreDtoList 施設登録更新DTOリスト
+   * @return 登録された施設のIDリスト、もしくはリソースエラーDTO
    */
   @POST
-  public Response createFacilities() {
-    // TODO:IDを返す？でも複数だし、、
-    // →新規作成された施設の情報を返す
-    return null;
+  @Consumes(CommonConstants.MEDIA_TYPE_JSON)
+  public Response createFacilities(List<FacilityStoreDto> facilityStoreDtoList) {
+    return new CreateFacilities().createFacilities(facilityStoreDtoList);
   }
 
   /**
    * 施設情報を更新します。
    * 
-   * @param id
-   * @return
+   * @param facilityId 施設ID
+   * @param facilityStoreDto 施設登録更新DTO
+   * @return 施設情報を保持したリソースシングルDTO、もしくはリソースエラーDTO
    */
   @Path("{id}")
   @PUT
-  public Response updateFacility(@PathParam("id") int id) {
-    // TODO:戻りはvoid？
-    return null;
+  @Consumes(CommonConstants.MEDIA_TYPE_JSON)
+  public Response updateFacility(@PathParam("id") int facilityId, FacilityStoreDto facilityStoreDto) {
+    return new UpdateFacility().updateFacility(facilityId, facilityStoreDto);
   }
 
   /**
    * 施設情報を削除します。
    * 
-   * @param facilityId
-   * @return
+   * @param facilityId 施設ID
+   * @return 空、もしくはリソースエラーDTO
    */
   @Path("{id}")
   @DELETE
   public Response deleteFacility(@PathParam("id") int facilityId) {
-    // TODO:戻りはvoid？
     return new DeleteFacility().deleteFacility(facilityId);
   }
 

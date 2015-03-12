@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.melip.common.constants.CodeConstants;
 
 /**
@@ -38,7 +40,10 @@ public class QueryCondition implements IQueryCondition {
   /**
    * コンストラクタ
    * 
-   * @param langDiv 言語区分
+   * @param langDiv 言語区分 「共通（common）」は自動的に付与されます。<br>
+   *        「共通（common）」を付与したくない場合は、<br>
+   *        {@link #setLangDivWithoutCommon(String)}を使用してください。
+   * 
    */
   public QueryCondition(String langDiv) {
     setLangDiv(langDiv);
@@ -56,7 +61,9 @@ public class QueryCondition implements IQueryCondition {
   /**
    * コンストラクタ
    * 
-   * @param langDiv 言語区分
+   * @param langDiv 言語区分 「共通（common）」は自動的に付与されます。<br>
+   *        「共通（common）」を付与したくない場合は、<br>
+   *        {@link #setLangDivWithoutCommon(String)}を使用してください。
    * @param param パラメータ
    */
   public QueryCondition(String langDiv, Object param) {
@@ -164,7 +171,20 @@ public class QueryCondition implements IQueryCondition {
    * @param langDiv 言語区分
    */
   public void setLangDiv(String langDiv) {
-    setLangDivArray(new String[] {langDiv, CodeConstants.CODE_LANG_DIV_COMMON});
+
+    if (StringUtils.isNotEmpty(langDiv)) {
+      setLangDivArray(new String[] {langDiv, CodeConstants.CODE_LANG_DIV_COMMON});
+    }
+  }
+
+  /**
+   * 言語区分を設定します。<br>
+   * 言語区分「共通（common）」は対象となりません。
+   * 
+   * @param langDiv 言語区分
+   */
+  public void setLangDivWithoutCommon(String langDiv) {
+    setLangDivArray(new String[] {langDiv});
   }
 
   /**

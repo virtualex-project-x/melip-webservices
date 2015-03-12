@@ -2,18 +2,23 @@ package com.melip.webservices.service.facility;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.melip.common.constants.CodeConstants;
+import com.melip.common.dto.common.AttrStoreDto;
 import com.melip.common.dto.common.FacilityDto;
-import com.melip.webservices.common.DtoList;
+import com.melip.common.dto.common.FacilityStoreDto;
+import com.melip.webservices.dto.DtoList;
 import com.melip.webservices.dto.FacilityDtoComparator;
 import com.melip.webservices.entity.Facility;
+import com.melip.webservices.entity.FacilityAttrGrp;
 import com.melip.webservices.entity.FacilityAttrVal;
 import com.melip.webservices.entity.FacilityAttrValLang;
 import com.melip.webservices.mapper.FacilityMapper;
@@ -58,7 +63,7 @@ public class FacilityService extends AbstractService implements IFacilityService
   @Transactional(readOnly = true)
   public DtoList<FacilityDto> getFacilityDtoList(QueryCondition condition) {
 
-    List<FacilityDto> facilityList = facilityMapper.getFacilityDto(condition);
+    List<FacilityDto> facilityList = facilityMapper.getFacilityDtoList(condition);
     Integer allCount = facilityList.size();
 
     // ソート
@@ -142,8 +147,115 @@ public class FacilityService extends AbstractService implements IFacilityService
   @Transactional(readOnly = true)
   public FacilityDto getFacilityDto(QueryCondition condition) {
 
-    List<FacilityDto> facilityList = facilityMapper.getFacilityDto(condition);
-    return facilityList.get(0);
+    List<FacilityDto> facilityList = facilityMapper.getFacilityDtoList(condition);
+    if (CollectionUtils.isNotEmpty(facilityList)) {
+      return facilityList.get(0);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#insertFacility(com.melip.webservices.entity.Facility)
+   */
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public Integer insertFacility(Facility facility) {
+
+    facilityMapper.insertFacility(facility);
+    return facility.getFacilityId();
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#insertFacilityAttrVal(com.melip.webservices.entity.FacilityAttrVal)
+   */
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public Integer insertFacilityAttrVal(FacilityAttrVal facilityAttrVal) {
+
+    facilityMapper.insertFacilityAttrVal(facilityAttrVal);
+    return facilityAttrVal.getFacilityAttrValId();
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#insertFacilityAttrValLang(com.melip.webservices.entity.FacilityAttrValLang)
+   */
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public Integer insertFacilityAttrValLang(FacilityAttrValLang facilityAttrValLang) {
+
+    facilityMapper.insertFacilityAttrValLang(facilityAttrValLang);
+    return facilityAttrValLang.getFacilityAttrValLangId();
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#insertFacilityValues(java.util.List)
+   */
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public List<Integer> insertFacilityValues(List<FacilityStoreDto> facilityStoreDtoList) {
+
+    List<Integer> facilityIdList = new ArrayList<Integer>();
+
+    if (CollectionUtils.isNotEmpty(facilityStoreDtoList)) {
+      for (FacilityStoreDto facilityStoreDto : facilityStoreDtoList) {
+        // 施設
+        Facility facility = new Facility();
+        setCommonPropertyForInsert(facility);
+        facility.setRegionId(facilityStoreDto.getRegionId());
+        facility.setPublishSts(facilityStoreDto.getPublishSts());
+        facility.setLatitude(facilityStoreDto.getLatitude());
+        facility.setLongitude(facilityStoreDto.getLongitude());
+        facility.setParentFacilityId(facilityStoreDto.getParentFacilityId());
+        insertFacility(facility);
+        facilityIdList.add(facility.getFacilityId());
+
+        // 施設属性値・施設属性値_多言語
+        List<AttrStoreDto> attrStoreDtoList = facilityStoreDto.getAttrStoreDtoList();
+        if (CollectionUtils.isNotEmpty(attrStoreDtoList)) {
+          Map<Integer, FacilityAttrVal> insertedFacilityAttrValMap =
+              new HashMap<Integer, FacilityAttrVal>();
+          for (AttrStoreDto attrStoreDto : attrStoreDtoList) {
+            // 施設属性値
+            // 施設ID、施設属性グループIDで一意になるよう処理する
+            Integer attrGrpId = attrStoreDto.getAttrGrpId();
+            FacilityAttrVal facilityAttrVal = null;
+            if (insertedFacilityAttrValMap.containsKey(attrGrpId)) {
+              facilityAttrVal = insertedFacilityAttrValMap.get(attrGrpId);
+            } else {
+              facilityAttrVal = new FacilityAttrVal();
+              setCommonPropertyForInsert(facilityAttrVal);
+              facilityAttrVal.setFacilityId(facility.getFacilityId());
+              facilityAttrVal.setFacilityAttrGrpId(attrGrpId);
+              insertFacilityAttrVal(facilityAttrVal);
+              insertedFacilityAttrValMap.put(attrGrpId, facilityAttrVal);
+            }
+
+            // 施設属性値_多言語
+            FacilityAttrValLang facilityAttrValLang = new FacilityAttrValLang();
+            setCommonPropertyForInsert(facilityAttrValLang);
+            facilityAttrValLang.setFacilityAttrValId(facilityAttrVal.getFacilityAttrValId());
+            facilityAttrValLang.setLangDiv(attrStoreDto.getAttrLangDiv());
+            facilityAttrValLang.setVal(attrStoreDto.getAttrVal());
+            insertFacilityAttrValLang(facilityAttrValLang);
+          }
+        }
+      }
+    }
+
+    return facilityIdList;
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#insertFacilityValues(com.melip.common.dto.common.FacilityStoreDto)
+   */
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public Integer insertFacilityValues(FacilityStoreDto facilityStoreDto) {
+
+    List<FacilityStoreDto> facilityStoreDtoList = new ArrayList<FacilityStoreDto>();
+    facilityStoreDtoList.add(facilityStoreDto);
+    return insertFacilityValues(facilityStoreDtoList).get(0);
   }
 
   /**
@@ -152,10 +264,63 @@ public class FacilityService extends AbstractService implements IFacilityService
   @Override
   @Transactional(rollbackFor = Exception.class)
   public int updateFacility(Facility facility) {
+    return facilityMapper.updateFacility(new QueryCondition(facility));
+  }
 
-    QueryCondition condition = new QueryCondition();
-    condition.setParam(facility);
-    return facilityMapper.updateFacility(condition);
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#updateFacilityAttrVal(com.melip.webservices.entity.FacilityAttrVal)
+   */
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public int updateFacilityAttrVal(FacilityAttrVal facilityAttrVal) {
+    return facilityMapper.updateFacilityAttrVal(new QueryCondition(facilityAttrVal));
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#updateFacilityAttrValLang(com.melip.webservices.entity.FacilityAttrValLang)
+   */
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public int updateFacilityAttrValLang(FacilityAttrValLang facilityAttrValLang) {
+    return facilityMapper.updateFacilityAttrValLang(new QueryCondition(facilityAttrValLang));
+  }
+
+  /**
+   * @see com.melip.webservices.service.facility.IFacilityService#updateFacilityValues(java.lang.Integer,
+   *      com.melip.common.dto.common.FacilityStoreDto)
+   */
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void updateFacilityValues(Integer facilityId, FacilityStoreDto facilityStoreDto) {
+
+    if (null != facilityStoreDto) {
+      // 施設
+      QueryCondition fCondition = new QueryCondition();
+      fCondition.setValue(Facility.FIELD_FACILITY_ID, facilityId);
+      Facility facility = facilityMapper.getFacility(fCondition);
+      facility.setRegionId(facilityStoreDto.getRegionId());
+      facility.setPublishSts(facilityStoreDto.getPublishSts());
+      facility.setLatitude(facilityStoreDto.getLatitude());
+      facility.setLongitude(facilityStoreDto.getLongitude());
+      facility.setParentFacilityId(facilityStoreDto.getParentFacilityId());
+      updateFacility(facility);
+
+      // 施設属性値_多言語
+      List<AttrStoreDto> attrStoreDtoList = facilityStoreDto.getAttrStoreDtoList();
+      if (CollectionUtils.isNotEmpty(attrStoreDtoList)) {
+        for (AttrStoreDto attrStoreDto : attrStoreDtoList) {
+          QueryCondition favlCondition = new QueryCondition();
+          favlCondition.setValue(FacilityAttrValLang.FIELD_LANG_DIV, attrStoreDto.getAttrLangDiv());
+          favlCondition.setValue(Facility.FIELD_FACILITY_ID, facilityId);
+          favlCondition.setValue(FacilityAttrGrp.FIELD_FACILITY_ATTR_GRP_ID,
+              attrStoreDto.getAttrGrpId());
+          FacilityAttrValLang facilityAttrValLang =
+              facilityMapper.getFacilityAttrValLang(favlCondition);
+          facilityAttrValLang.setVal(attrStoreDto.getAttrVal());
+          updateFacilityAttrValLang(facilityAttrValLang);
+        }
+      }
+    }
   }
 
   /**
@@ -209,20 +374,21 @@ public class FacilityService extends AbstractService implements IFacilityService
   @Transactional(rollbackFor = Exception.class)
   public void logicalDeleteFacility(Integer facilityId) {
 
+    String sts = CodeConstants.CODE_STS_DELETED;
     // TODO:施設_施設グループ_リンク属性値_多言語
     // TODO:施設_施設グループ_リンク属性値
     // TODO:施設_施設グループ_リンク
     // 施設属性値_多言語
     FacilityAttrValLang favl = new FacilityAttrValLang();
-    favl.setSts(CodeConstants.CODE_STS_DELETED);
+    favl.setSts(sts);
     updateFacilityAttrValLangByFacilityId(facilityId, null, favl);
     // 施設属性値
     FacilityAttrVal fav = new FacilityAttrVal();
-    fav.setSts(CodeConstants.CODE_STS_DELETED);
+    fav.setSts(sts);
     updateFacilityAttrValByFacilityId(facilityId, fav);
     // 子施設
     Facility f = new Facility();
-    f.setSts(CodeConstants.CODE_STS_DELETED);
+    f.setSts(sts);
     updateChildFacilityByParentFacilityId(facilityId, f);
     // 施設
     f.setFacilityId(facilityId);

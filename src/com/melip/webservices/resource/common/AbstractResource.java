@@ -11,8 +11,8 @@ import com.melip.common.dto.common.IDto;
 import com.melip.common.dto.common.ResourceErrorDto;
 import com.melip.common.dto.common.ResourceMultiDto;
 import com.melip.common.dto.common.ResourceSingleDto;
-import com.melip.webservices.common.DtoList;
 import com.melip.webservices.constants.MessageConstants;
+import com.melip.webservices.dto.DtoList;
 import com.melip.webservices.system.MessageProvider;
 
 /**

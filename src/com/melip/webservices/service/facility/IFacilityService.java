@@ -1,7 +1,10 @@
 package com.melip.webservices.service.facility;
 
+import java.util.List;
+
 import com.melip.common.dto.common.FacilityDto;
-import com.melip.webservices.common.DtoList;
+import com.melip.common.dto.common.FacilityStoreDto;
+import com.melip.webservices.dto.DtoList;
 import com.melip.webservices.entity.Facility;
 import com.melip.webservices.entity.FacilityAttrVal;
 import com.melip.webservices.entity.FacilityAttrValLang;
@@ -60,12 +63,77 @@ public interface IFacilityService {
   public FacilityDto getFacilityDto(QueryCondition condition);
 
   /**
+   * 施設を登録します。
+   * 
+   * @param facility 施設
+   * @return 施設ID
+   */
+  public Integer insertFacility(Facility facility);
+
+  /**
+   * 施設属性値を登録します。
+   * 
+   * @param facilityAttrVal 施設属性値
+   * @return 施設属性値ID
+   */
+  public Integer insertFacilityAttrVal(FacilityAttrVal facilityAttrVal);
+
+  /**
+   * 施設属性値_多言語を登録します。
+   * 
+   * @param facilityAttrValLang 施設属性値_多言語
+   * @return 施設属性値_多言語ID
+   */
+  public Integer insertFacilityAttrValLang(FacilityAttrValLang facilityAttrValLang);
+
+  /**
+   * 施設・施設属性値・施設属性値_多言語を登録します。<br>
+   * すべてのデータを1トランザクションで登録します。
+   * 
+   * @param facilityStoreDtoList 施設登録更新DTOリスト
+   * @return 施設IDリスト
+   */
+  public List<Integer> insertFacilityValues(List<FacilityStoreDto> facilityStoreDtoList);
+
+  /**
+   * 施設・施設属性値・施設属性値_多言語を登録します。
+   * 
+   * @param facilityStoreDto 施設登録更新DTO
+   * @return 施設ID
+   */
+  public Integer insertFacilityValues(FacilityStoreDto facilityStoreDto);
+
+  /**
    * 施設を更新します。
    * 
    * @param facility 施設
    * @return 更新件数
    */
   public int updateFacility(Facility facility);
+
+  /**
+   * 施設属性値を更新します。
+   * 
+   * @param facilityAttrVal 施設属性値
+   * @return 更新件数
+   */
+  public int updateFacilityAttrVal(FacilityAttrVal facilityAttrVal);
+
+  /**
+   * 施設属性値_多言語を更新します。
+   * 
+   * @param facilityAttrValLang 施設属性値_多言語
+   * @return 更新件数
+   */
+  public int updateFacilityAttrValLang(FacilityAttrValLang facilityAttrValLang);
+
+  /**
+   * 施設・施設属性値・施設属性値_多言語を更新します。
+   * 
+   * @param facilityId 施設ID
+   * @param facilityStoreDto 施設登録更新DTO
+   */
+  public void updateFacilityValues(Integer facilityId, FacilityStoreDto facilityStoreDto);
 
   /**
    * 子施設を一括更新します。

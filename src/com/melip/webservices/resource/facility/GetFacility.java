@@ -8,15 +8,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.melip.common.constants.CommonConstants;
-import com.melip.common.dto.common.AbstractResourceDto;
 import com.melip.common.dto.common.FacilityDto;
 import com.melip.webservices.common.BeanCreator;
 import com.melip.webservices.constants.MessageConstants;
+import com.melip.webservices.dto.FacilitySearchConditionDto;
 import com.melip.webservices.resource.common.AbstractResource;
+import com.melip.webservices.service.common.QueryCondition;
 import com.melip.webservices.service.facility.IFacilityService;
 import com.melip.webservices.system.MelipRuntimeException;
 import com.melip.webservices.system.MessageProvider;
@@ -39,7 +41,7 @@ public class GetFacility extends AbstractResource {
   public Response getFacility(int facilityId, String langDiv, String attrGrpAlias) {
 
     int status = HttpServletResponse.SC_OK;
-    AbstractResourceDto resourceDto = null;
+    Object responseEntity = null;
 
     try {
       // パラメータチェック
@@ -51,29 +53,42 @@ public class GetFacility extends AbstractResource {
           log.error(errMsg);
         }
         status = HttpServletResponse.SC_BAD_REQUEST;
-        resourceDto = createResourceErrorDto(FacilityDto.ENTITY, errMsgList);
+        responseEntity = createResourceErrorDto(FacilityDto.ENTITY, errMsgList);
       } else {
+        // 検索条件生成
+        FacilitySearchConditionDto facilityConditionDto = new FacilitySearchConditionDto();
+        if (StringUtils.isNotEmpty(attrGrpAlias)) {
+          facilityConditionDto.setTargetAttrGrpAliasList(Arrays.asList(attrGrpAlias
+              .split(SEPARATOR_ITEM)));
+        }
+        QueryCondition queryCondition = new QueryCondition();
+        if (StringUtils.isNotEmpty(langDiv)) {
+          queryCondition.setLangDiv(langDiv);
+        }
+        queryCondition.setParam(facilityConditionDto);
+        queryCondition.setValue(FacilityDto.FIELD_FACILITY_ID, facilityId);
+
         // 施設DTOリスト取得
         IFacilityService service =
             BeanCreator.getBean(IFacilityService.SERVICE_NAME, IFacilityService.class);
-        FacilityDto facilityDto = service.getFacilityDto(langDiv, facilityId);
+        FacilityDto facilityDto = service.getFacilityDto(queryCondition);
         // 取得できなかった場合
         if (null == facilityDto) {
           status = HttpServletResponse.SC_NOT_FOUND;
-          resourceDto =
+          responseEntity =
               createResourceErrorDto(FacilityDto.ENTITY,
                   Arrays.asList(MessageProvider.formatMessage(MessageConstants.RSC_0004)));
         } else {
-          resourceDto = createResourceSingleDto(FacilityDto.ENTITY, facilityDto);
+          responseEntity = createResourceSingleDto(FacilityDto.ENTITY, facilityDto);
         }
       }
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-      resourceDto = createResourceErrorDto(FacilityDto.ENTITY, new MelipRuntimeException(e));
+      responseEntity = createResourceErrorDto(FacilityDto.ENTITY, new MelipRuntimeException(e));
     }
 
-    return Response.status(status).entity(resourceDto).type(CommonConstants.MEDIA_TYPE_JSON)
+    return Response.status(status).entity(responseEntity).type(CommonConstants.MEDIA_TYPE_JSON)
         .build();
   }
 
@@ -95,8 +110,6 @@ public class GetFacility extends AbstractResource {
     }
 
     List<String> errMsgList = new ArrayList<String>();
-    // 言語区分必須チェック
-    checkRequired(errMsgList, PARAM_LANG_DIV, langDiv);
     // 属性グループエイリアスの形式チェック
     checkAttrGrpAlias(errMsgList, PARAM_ATTR_GRP_ALIAS, attrGrpAlias);
 
