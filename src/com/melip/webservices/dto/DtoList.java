@@ -1,4 +1,4 @@
-package com.melip.webservices.common;
+package com.melip.webservices.dto;
 
 import java.util.ArrayList;
 import java.util.Collection;
