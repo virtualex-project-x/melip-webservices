@@ -55,7 +55,6 @@ public class UpdateFacility extends AbstractResource {
         IFacilityService service =
             BeanCreator.getBean(IFacilityService.SERVICE_NAME, IFacilityService.class);
         service.updateFacilityValues(facilityId, facilityStoreDto);
-        // TODO:全言語区分返されてしまう。
         return new GetFacility().getFacility(facilityId, null, null);
       }
     } catch (Exception e) {
