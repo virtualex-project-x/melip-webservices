@@ -59,11 +59,11 @@ public class FacilityDtoComparator implements Comparator<FacilityDto> {
     }
     // 左がnull
     else if (StringUtils.isEmpty(val1) && StringUtils.isNotEmpty(val2)) {
-      returnVal = nullFirst ? -1 : 1;
+      returnVal = isNullFirst() ? -1 : 1;
     }
     // 右がnull
     else if (StringUtils.isNotEmpty(val1) && StringUtils.isEmpty(val2)) {
-      returnVal = nullFirst ? 1 : -1;
+      returnVal = isNullFirst() ? 1 : -1;
     }
     // 両方nullでない
     else {
@@ -74,7 +74,7 @@ public class FacilityDtoComparator implements Comparator<FacilityDto> {
       }
     }
 
-    return isAsc ? returnVal : returnVal * -1;
+    return isAsc() ? returnVal : returnVal * -1;
   }
 
   /**
@@ -100,7 +100,7 @@ public class FacilityDtoComparator implements Comparator<FacilityDto> {
    * 
    * @return 先の場合 true、後の場合 false
    */
-  public Boolean getNullFirst() {
+  public Boolean isNullFirst() {
     return nullFirst;
   }
 
