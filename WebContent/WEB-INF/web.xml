@@ -12,6 +12,24 @@
     </param-value>
   </context-param>
 
+  <!-- アクセスログ -->
+  <filter>
+    <filter-name>accessLogFilter</filter-name>
+    <filter-class>com.melip.webservices.common.AccessLogFilter</filter-class>
+    <!--<init-param>
+      <param-name>outputStartLog</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>outputEndLog</param-name>
+      <param-value>true</param-value>
+    </init-param>-->
+  </filter>
+  <filter-mapping>
+    <filter-name>accessLogFilter</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+
   <!-- Log4J -->
   <listener>
     <listener-class>com.melip.webservices.service.initialize.LoggingInitializeServletContextListener</listener-class>
@@ -48,5 +66,5 @@
     <servlet-name>Jersey Servlet</servlet-name>
     <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
-<!-- TODO:フィルタでアクセスログのようなものを出力したい -->
+
 </web-app>
